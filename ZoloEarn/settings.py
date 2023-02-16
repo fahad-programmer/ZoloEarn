@@ -42,22 +42,10 @@ INSTALLED_APPS = [
     #Rest framework
     'rest_framework',
     'rest_framework.authtoken',
-
-    #dj_rest_auth
-    'dj_rest_auth',
-
+    
     #Custom Apps
     "Profile",
     "rewards",
-
-    #Social Authentication
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-
-    #Providers
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.facebook',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +63,7 @@ ROOT_URLCONF = 'ZoloEarn.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -150,16 +138,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
-#Social Apps
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    }
-}
+#Authentication backends
+AUTHENTICATION_BACKENDS = [
+
+    # Needed to login by username in Django admin
+    'django.contrib.auth.backends.ModelBackend',
+
+    # specific authentication methods, such as login by e-mail
+    'ZoloEarn.backend.EmailBackend',
+
+
+]
