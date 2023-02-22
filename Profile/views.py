@@ -8,6 +8,11 @@ from rest_framework.authtoken.models import Token
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, permissions
+from rest_framework.views import APIView
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from django_email_verification import send_email
 
 User = get_user_model()
 
@@ -23,6 +28,13 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"message":"Email Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
+
+            # Set user as active
+            user = User.objects.get(pk=serializer.data['id'])
+            user.is_active = False
+            user.save()
+            send_email(user)
+
         except IntegrityError:
             return Response({"message": "Username or email is already in use"}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError:
@@ -33,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
         token, created = Token.objects.get_or_create(user=user)
 
         # Return the token in the response
-        return Response({'token': token.key}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'message': "created"}, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def login(self, request, *args, **kwargs):
@@ -41,7 +53,14 @@ class UserViewSet(viewsets.ModelViewSet):
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
+            if user.is_active:
+                token, created = Token.objects.get_or_create(user=user)
+                return Response({'token': token.key})
+            else:
+                return Response({"message": "Verify Your Email"}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
         else:
             return Response({"message":"Username Or Password Is Incorrect"},status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+

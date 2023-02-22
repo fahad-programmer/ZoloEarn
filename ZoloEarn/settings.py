@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     #Custom Apps
     "Profile",
     "rewards",
+
+    #Email Verification
+    'django_email_verification',
 ]
 
 MIDDLEWARE = [
@@ -147,5 +150,27 @@ AUTHENTICATION_BACKENDS = [
     # specific authentication methods, such as login by e-mail
     'ZoloEarn.backend.EmailBackend',
 
-
 ]
+
+#Email Verification Settings
+def verified_callback(user):
+    user.is_active = True
+
+
+EMAIL_VERIFIED_CALLBACK = verified_callback
+EMAIL_FROM_ADDRESS = 'unexpectedprogrammer@gmail.com'
+EMAIL_MAIL_SUBJECT = 'Confirm your email {{ user.username }}'
+EMAIL_MAIL_HTML = 'mail/mail.html'
+EMAIL_MAIL_PLAIN = 'mail/mail.txt'
+EMAIL_MAIL_TOKEN_LIFE = 60 * 60
+EMAIL_MAIL_PAGE_TEMPLATE = 'mail/confirm_template.html'
+EMAIL_PAGE_DOMAIN = 'http://127.0.0.1:8000'
+EMAIL_MULTI_USER = False  # optional (defaults to False)
+
+# For Django Email Backend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'qikkscorp.inc@gmail.com'
+EMAIL_HOST_PASSWORD = 'oauwtpwpummpzgbe'  # os.environ['password_key'] suggested
+EMAIL_USE_TLS = True

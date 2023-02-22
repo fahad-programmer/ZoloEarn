@@ -25,7 +25,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     number = models.CharField(max_length=11, blank=True, null=True)
     refferal = models.CharField(max_length=7, blank=True, null=True)
-    user_code = models.CharField(max_length=7, default=generate_unique_code, unique=True)
+    user_code = models.CharField(max_length=7, default=generate_unique_code, unique=True, blank=True, null=True)
     profile_pic_path = models.CharField(max_length=255, blank=True, null=True, default=get_random_image_path)
     total_earned = models.CharField(max_length=5000, blank=True, null=True, default="0")
 
@@ -48,3 +48,6 @@ class Wallet(models.Model):
 
     def __str__(self) -> str:
         return self.user.username
+
+
+

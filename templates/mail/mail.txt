@@ -1,0 +1,12 @@
+Dear user.username,
+
+Thank you for signing up for ZoloEarn  We're excited to have you as a new user!
+
+To complete your registration, we require you to verify your email address by clicking on the link below:
+
+Please note that this link is unique to your account and will expire in {{ expiry|time:"TIME_FORMAT" }}. If you encounter any issues with the verification process or if you didn't create an account with us, please contact our support team at qikkscorp.inc@gmail.com.
+
+Thank you for choosing ZoloEarn as your service provider. We look forward to serving you!
+
+Best regards,
+The ZoloEarn Team

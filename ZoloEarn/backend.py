@@ -18,7 +18,7 @@ class EmailBackend(ModelBackend):
         except UserModel.MultipleObjectsReturned:
             return User.objects.filter(email=username).order_by('id').first()
         else:
-            if user.check_password(password) and self.user_can_authenticate(user):
+            if user.check_password(password):
                 return user
 
     def get_user(self, user_id):
@@ -27,4 +27,4 @@ class EmailBackend(ModelBackend):
         except UserModel.DoesNotExist:
             return None
 
-        return user if self.user_can_authenticate(user) else None
+        return user
