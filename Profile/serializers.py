@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import Transaction, Referral
 
 User = get_user_model()
 
@@ -14,3 +15,12 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = ('id', 'points', 'payment_method')
+
+class ReferralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Referral
+        fields = ('code',)

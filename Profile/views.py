@@ -1,18 +1,17 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer
+from .models import Transaction, Referral, Wallet, Profile, RecentEarnings
 from django.contrib.auth import authenticate, login, get_user_model
-from rest_framework.decorators import api_view, action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-from rest_framework import viewsets, permissions
-from rest_framework.views import APIView
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.conf import settings
+from rest_framework import viewsets
 from django_email_verification import send_email
+from rest_framework.views import APIView
+from rest_framework import generics
 
 User = get_user_model()
 
@@ -63,4 +62,84 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 
+class TransactionListCreateView(generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
 
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Transaction.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        points = serializer.validated_data['points']
+        payment_method = serializer.validated_data['payment_method']
+        transaction = Transaction(user=user, points=points, payment_method=payment_method)
+        if transaction.check_balance():
+            transaction.save()
+            wallet = Wallet.objects.get(user=user)
+            wallet.points -= points
+            wallet.save()
+        else:
+            raise ValidationError('Insufficient balance')
+        
+
+class ReferralView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Referral.objects.all()
+    serializer_class = ReferralSerializer
+
+    def post(self, request, format=None):
+        # Deserialize the request data using the ReferralSerializer
+        serializer = ReferralSerializer(data=request.data)
+
+        if serializer.is_valid():
+            code = serializer.validated_data.get('code')
+            current_user = request.user
+
+            # Check if the provided referral code is valid
+            try:
+                referred_user_profile = Profile.objects.get(user_code=code)
+            except Profile.DoesNotExist:
+                return Response({"error": "Invalid referral code"}, status=status.HTTP_400_BAD_REQUEST)
+
+            referred_user = referred_user_profile.user
+
+            # Check if the current user is trying to refer themselves
+            if referred_user == current_user:
+                return Response({"error": "You cannot refer yourself"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if the current user already has a referrer code
+            try:
+                Referral.objects.get(user=Profile.objects.get(user=current_user))
+                return Response({"message": "You already have a referrer code"}, status=status.HTTP_400_BAD_REQUEST)
+            except Referral.DoesNotExist:
+                pass
+
+            # Add points to the referrer's wallet and create a new referral
+            referrer_wallet = Wallet.objects.get(user=current_user)
+            Referral.objects.create(user=Profile.objects.get(user=current_user), code=code)
+            referrer_wallet.points += 50
+            referrer_wallet.save()
+
+            #Writing the earning history from database
+            referrer_earning = RecentEarnings.objects.create(user=Profile.objects.get(user=current_user), way_to_earn="Referral Points", points_earned=50)
+            referrer_earning.save()
+
+
+            # Add points to the referred user's wallet
+            referred_user_wallet = Wallet.objects.get(user=referred_user)
+            referred_user_wallet.points += 100
+            referred_user_wallet.save()
+
+            #Writing the earning history from database
+            referrerd_earning = RecentEarnings.objects.create(user=Profile.objects.get(user=referred_user), way_to_earn="Referral Points", points_earned=50)
+            referred_user.save()
+
+            return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
