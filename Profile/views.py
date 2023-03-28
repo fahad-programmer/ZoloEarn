@@ -44,19 +44,19 @@ class UserViewSet(viewsets.ModelViewSet):
         token, created = Token.objects.get_or_create(user=user)
 
         # Return the token in the response
-        return Response({'message': "created"}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'token': token.key}, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def login(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
+        token, created = Token.objects.get_or_create(user=user)
         if user is not None:
             if user.is_active:
-                token, created = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key})
+                return Response({'token': token.key, "message" : "verified"})
             else:
-                return Response({"message": "Verify Your Email"}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+                return Response({"message": "non-verified", "token":token.key}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
         else:
             return Response({"message":"Username Or Password Is Incorrect"},status=status.HTTP_401_UNAUTHORIZED)
 
@@ -143,3 +143,29 @@ class ReferralView(APIView):
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResendVerificationEmail(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            if user.is_active:
+                return Response({"message": "Your account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                send_email(user)
+                return Response({"message": "Email Has Been Send Successfully"}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message": "User with this email does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class CheckUserActive(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.is_active:
+            return Response({"message": "User is active."})
+        else:
+            return Response({"message": "User is not active."}, status=status.HTTP_403_FORBIDDEN)

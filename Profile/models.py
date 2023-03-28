@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 import os
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import datetime
+from django.utils.crypto import get_random_string
 # Create your models here.
 
 def generate_unique_code():
@@ -14,8 +14,19 @@ def generate_unique_code():
         code = ''.join(random.choices(string.digits, k=length))
         if Profile.objects.filter(user_code=code).count() == 0:
             break
-
     return code
+
+
+def generate_username(email):
+    # Get the username from the email by removing the domain name
+    username = email.split('@')[0]
+
+    # Check if the username is already taken
+    if User.objects.filter(username=username).exists():
+        # If the username is taken, add a random string at the end to make it unique
+        username += '_' + get_random_string(length=5)
+
+    return username
 
 def get_random_image_path():
     path = "./media/user_profile_images/"

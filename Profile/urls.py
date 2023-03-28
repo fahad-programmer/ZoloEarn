@@ -12,6 +12,8 @@ urlpatterns = [
         'post': 'login'
     })),
     path('transaction', views.TransactionListCreateView.as_view(), name="create-transaction"),
-    path('referral', views.ReferralView.as_view())
+    path('referral', views.ReferralView.as_view()),
+    path('resend-verification-email', views.ResendVerificationEmail.as_view(), name='resend-verification-email'),
+    path('check-user-active', views.CheckUserActive.as_view(), name="check-user-active")
 
    ]
