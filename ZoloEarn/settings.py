@@ -13,8 +13,15 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import socket
 
 load_dotenv()
+
+# Get the hostname of the current machine
+hostname = socket.gethostname()
+
+# Get the domain name from the hostname
+domain = '.'.join(hostname.split('.')[1:])
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +36,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://web-production-e008.up.railway.app/"]
+ALLOWED_HOSTS = [domain]
 
 
 # Application definition
