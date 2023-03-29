@@ -44,7 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
         token, created = Token.objects.get_or_create(user=user)
 
         # Return the token in the response
-        return Response({'token': token.key}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'token': token.key, "message":"Account Created"}, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def login(self, request, *args, **kwargs):
