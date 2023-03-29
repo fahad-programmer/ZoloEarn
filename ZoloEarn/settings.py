@@ -174,7 +174,7 @@ EMAIL_MAIL_HTML = 'mail/mail.html'
 EMAIL_MAIL_PLAIN = 'mail/mail.txt'
 EMAIL_MAIL_TOKEN_LIFE = 60 * 60
 EMAIL_MAIL_PAGE_TEMPLATE = 'mail/confirm_template.html'
-EMAIL_PAGE_DOMAIN = 'http://127.0.0.1:8000'
+EMAIL_PAGE_DOMAIN = domain
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # For Django Email Backend
