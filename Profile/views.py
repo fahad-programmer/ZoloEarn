@@ -166,6 +166,6 @@ class CheckUserActive(APIView):
     def get(self, request):
         user = request.user
         if user.is_active:
-            return Response({"message": "User is active."})
+            return Response({"message": "User is active."}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "User is not active."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "User is not active."}, status=status.HTTP_200_OK)
