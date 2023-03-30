@@ -160,15 +160,11 @@ class ResendVerificationEmail(APIView):
         
 
 class CheckUserActive(APIView):
-    
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
-        try:
-            user = request.user
-            if user.is_active:
-                return Response({"message": "User is active."}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "User is not active."}, status=status.HTTP_200_OK)
-        except Token.DoesNotExist:
-            return Response({"message": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        if user.is_active:
+            return Response({"message": "User is active."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "User is not active."}, status=status.HTTP_200_OK)
