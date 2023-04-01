@@ -33,11 +33,10 @@ class SpinWheelView(APIView):
 
         return Response({'message': f'{points} points added to your account.'}, status=200)
 
-
 class DailyCheckIn(APIView):
     authentication_classes = [TokenAuthentication]
 
-    def post(self, request, args, **kwargs):
+    def post(self, request, **kwargs):
 
         # Get the authenticated user from the request
         user = request.user
@@ -45,7 +44,7 @@ class DailyCheckIn(APIView):
         # Check if the user has already earned points for a daily check-in in the last 24 hours
         last_check_in = RecentEarnings.objects.filter(user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
         if last_check_in and timezone.now() - last_check_in.created_at < timedelta(days=1):
-            return Response({'message': 'You have already earned points for a daily check-in in the last 24 hours.'}, status=400)
+            return Response({'message': 'You have already earned points for a daily check-in in the last 24 hours.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Add the points to the user's account
         user_wallet = Wallet.objects.get(user=user)
@@ -54,7 +53,8 @@ class DailyCheckIn(APIView):
 
         RecentEarnings.objects.create(user=user, way_to_earn="Daily Check-In", point_earned=50)
 
-        return Response({'message': f'{50} points added to your account.'}, status=200)
+        return Response({'message': f'{50} points added to your account.'}, status=status.HTTP_200_OK)
+
     
 
 class WalletView(APIView):
