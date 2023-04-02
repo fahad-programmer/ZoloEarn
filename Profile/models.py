@@ -57,8 +57,9 @@ class Wallet(models.Model):
         if created:
             Wallet.objects.create(user=instance)
 
-    def add_points(self, points):
-        return self.points + points
+        def add_points(self, points):
+            self.points += points
+            self.save()
 
     def __str__(self) -> str:
         return self.user.username
@@ -70,45 +71,49 @@ class Transaction(models.Model):
     payment_method = models.CharField(max_length=100, default="Easypaisa")
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
-
     def check_balance(self):
         current_user_points = Wallet.objects.get(user=self.user).points
-        if self.points > current_user_points:
-            return False
-        else:
-            return True
+        return self.points <= current_user_points
         
     def deduct_balance(self):
-        current_user_points = Wallet.objects.get(user=self.user).points
+        current_user_points = self.get_current_user_points()
         current_user_points -= self.points
+        wallet = Wallet.objects.get(user=self.user)
+        wallet.points = current_user_points
+        wallet.save()
 
-
+    def get_current_user_points(self):
+        return Wallet.objects.get(user=self.user).points
 
     def __str__(self) -> str:
-        return f"{self.user.username} made transaction of {self.points} points in {self.payment_method}"
-    
+        return f"{self.user.username} made a transaction of {self.points} points via {self.payment_method}"
+
 class RecentEarnings(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     way_to_earn = models.CharField(max_length=300, blank=True, null=True)
     point_earned = models.IntegerField(blank=True, null=True, default=0)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
+    def __str__(self) -> str:
+        return f"{self.user.first_name} earned {self.point_earned} through {self.way_to_earn}"
+     
+
 
 class Referral(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
-    code  = models.CharField(max_length=7, null=True, blank=True)
+    code = models.CharField(max_length=7, null=True, blank=True)
 
     def check_code(self):
-        if (Profile.objects.get(user_code=self.code)).exits():
+        if self.code is not None and Profile.objects.filter(user_code=self.code).exists():
             self.add_points_to_referrer()
             return True
         else:
             return False
 
-   
     def __str__(self) -> str:
         referred_user = self.user.user.username
         referred_by = Profile.objects.get(user_code=self.code).user.username
-        return f"The user {referred_user} was refferd by the user {referred_by}"
+        return f"The user {referred_user} was referred by the user {referred_by}"
+
 
 

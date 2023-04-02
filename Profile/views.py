@@ -62,7 +62,7 @@ class UserViewSet(viewsets.ModelViewSet):
             else:
                 return Response({"message": "non-verified", "token":token.key}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
         else:
-            return Response({"message":"Username Or Password Is Incorrect"},status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message":"Username Or Password Is Incorrect"},status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -131,7 +131,7 @@ class ReferralView(APIView):
             referrer_wallet.save()
 
             #Writing the earning history from database
-            referrer_earning = RecentEarnings.objects.create(user=Profile.objects.get(user=current_user), way_to_earn="Referral Points", points_earned=50)
+            referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points", point_earned=50)
             referrer_earning.save()
 
 
@@ -141,8 +141,8 @@ class ReferralView(APIView):
             referred_user_wallet.save()
 
             #Writing the earning history from database
-            referrerd_earning = RecentEarnings.objects.create(user=Profile.objects.get(user=referred_user), way_to_earn="Referral Points", points_earned=50)
-            referred_user.save()
+            referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points", point_earned=50)
+            referrerd_earning.save()
 
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
 
