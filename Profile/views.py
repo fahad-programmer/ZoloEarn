@@ -109,13 +109,13 @@ class ReferralView(APIView):
             try:
                 referred_user_profile = Profile.objects.get(user_code=code)
             except Profile.DoesNotExist:
-                return Response({"error": "Invalid referral code"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Invalid referral code"}, status=status.HTTP_400_BAD_REQUEST)
 
             referred_user = referred_user_profile.user
 
             # Check if the current user is trying to refer themselves
             if referred_user == current_user:
-                return Response({"error": "You cannot refer yourself"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "You cannot refer yourself"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Check if the current user already has a referrer code
             try:
