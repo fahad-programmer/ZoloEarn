@@ -13,7 +13,7 @@ from django_email_verification import send_email
 from rest_framework.views import APIView
 from rest_framework import generics
 import time
-from actstream import action
+
 
 # Store the last time an email was sent in a dictionary
 last_email_sent = {}
