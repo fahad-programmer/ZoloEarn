@@ -16,5 +16,6 @@ urlpatterns = [
     path('resend-verification-email', views.ResendVerificationEmail.as_view(), name='resend-verification-email'),
     path('check-user-active/<str:token>', views.CheckUserActive.as_view(), name="check-user-active"),
     path('get-refferals', views.ReferralList.as_view(), name="refferal users")
+    path('get-user-code', views.UserCodeAPIView.as_view(), name="userCode")
 
    ]

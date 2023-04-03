@@ -190,6 +190,20 @@ class CheckUserActive(APIView):
         except Token.DoesNotExist:
             message = "Invalid token."
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class UserCodeAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, **kwargs):
+        user = request.user
+        try:
+            profile = Profile.objects.get(user=user)
+            user_code = profile.user_code
+            return Response({'message': user_code})
+        except Profile.DoesNotExist:
+            return Response({'message': 'Profile does not exist for this user'})
 
 
 
