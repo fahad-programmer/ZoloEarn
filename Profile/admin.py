@@ -1,5 +1,4 @@
 from django.contrib import admin
-from actstream import registry
 from .models import Profile, Wallet, Transaction, Referral, RecentEarnings
 
 # Register your models here.
