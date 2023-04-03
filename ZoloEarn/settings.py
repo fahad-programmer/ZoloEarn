@@ -42,6 +42,7 @@ ALLOWED_HOSTS = ["web-production-e008.up.railway.app", "*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     #Custom Apps
     "Profile",
     "rewards",
+
 
     #Email Verification
     'django_email_verification',
@@ -91,6 +93,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ZoloEarn.wsgi.application'
 
+
+SITE_ID = 1
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

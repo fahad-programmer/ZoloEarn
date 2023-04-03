@@ -13,6 +13,7 @@ from django_email_verification import send_email
 from rest_framework.views import APIView
 from rest_framework import generics
 import time
+from actstream import action
 
 # Store the last time an email was sent in a dictionary
 last_email_sent = {}
@@ -109,13 +110,13 @@ class ReferralView(APIView):
             try:
                 referred_user_profile = Profile.objects.get(user_code=code)
             except Profile.DoesNotExist:
-                return Response({"error": "Invalid referral code"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Invalid referral code"}, status=status.HTTP_400_BAD_REQUEST)
 
             referred_user = referred_user_profile.user
 
             # Check if the current user is trying to refer themselves
             if referred_user == current_user:
-                return Response({"error": "You cannot refer yourself"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "You cannot refer yourself"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Check if the current user already has a referrer code
             try:
@@ -144,6 +145,7 @@ class ReferralView(APIView):
             referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points", point_earned=50)
             referrerd_earning.save()
 
+            action.send(current_user, verb='user successfully entred their referral', target=Referral)
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -155,6 +157,7 @@ class ResendVerificationEmail(APIView):
         try:
             user = User.objects.get(email=email)
             if user.is_active:
+                action.send(user, verb='User successfully verified their email', target=User)
                 return Response({"message": "Your account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 # Check the last time an email was sent to this user
@@ -188,3 +191,16 @@ class CheckUserActive(APIView):
             message = "Invalid token."
             return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class ReferralList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        referrals = Referral.objects.filter(code=request.user.profile.user_code)
+        data = []
+        for referral in referrals:
+            referred_user = referral.user.user.username
+            referred_by = referral.code
+            data.append({'referred_user': referred_user, 'referred_by': referred_by})
+        return Response(data)

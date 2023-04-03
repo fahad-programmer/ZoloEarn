@@ -23,5 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("Profile.urls")),
     path('email/', include(email_urls)),
-    path('api/rewards/', include("rewards.urls"))
+    path('api/rewards/', include("rewards.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

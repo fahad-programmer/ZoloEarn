@@ -103,12 +103,6 @@ class Referral(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     code = models.CharField(max_length=7, null=True, blank=True)
 
-    def check_code(self):
-        if self.code is not None and Profile.objects.filter(user_code=self.code).exists():
-            self.add_points_to_referrer()
-            return True
-        else:
-            return False
 
     def __str__(self) -> str:
         referred_user = self.user.user.username

@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import get_user_model
@@ -65,7 +65,7 @@ class DailyCheckIn(APIView):
         return Response({'message': f'{50} points added to your account.'}, status=200)
 
 
-
+  
     
 
 class WalletView(APIView):
@@ -79,7 +79,7 @@ class WalletView(APIView):
         try:
             user_wallet = Wallet.objects.select_related('user').get(user=user)
         except Wallet.DoesNotExist:
-            return Response({'message': 'Wallet does not exist'}, status=400)
+            return Response({'message': 'Wallet does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Return the current points in the user's wallet
-        return Response({'message': str(user_wallet.points)}, status=200)
+        return Response({'message': str(user_wallet.points)}, status=status.HTTP_200_OK)
