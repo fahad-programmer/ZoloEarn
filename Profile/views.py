@@ -198,7 +198,7 @@ class UserCodeAPIView(APIView):
         try:
             profile = Profile.objects.get(user=user)
             user_code = profile.user_code
-            return Response({'user_code': user_code})
+            return Response({'message': user_code})
         except Profile.DoesNotExist:
-            return Response({'error': 'Profile does not exist for this user'})
+            return Response({'message': 'Profile does not exist for this user'})
 
