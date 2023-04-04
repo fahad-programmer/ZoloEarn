@@ -30,3 +30,13 @@ class ReferralSerializer(serializers.ModelSerializer):
     class Meta:
         model = Referral
         fields = ('code',)
+
+
+class GetReferralSerializer(serializers.ModelSerializer):
+    referred_user = serializers.CharField(source='user.user.username')
+    signed_up_at = serializers.DateField()
+
+    class Meta:
+        model = Referral
+        fields = ['referred_user', 'signed_up_at']
+        read_only_fields = ['referred_user', 'signed_up_at']

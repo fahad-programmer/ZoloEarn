@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer
 from .models import Transaction, Referral, Wallet, Profile, RecentEarnings
 from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +13,7 @@ from django_email_verification import send_email
 from rest_framework.views import APIView
 from rest_framework import generics
 import time
-from actstream import action
+
 
 # Store the last time an email was sent in a dictionary
 last_email_sent = {}
@@ -145,7 +145,7 @@ class ReferralView(APIView):
             referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points", point_earned=50)
             referrerd_earning.save()
 
-            action.send(current_user, verb='user successfully entred their referral', target=Referral)
+           
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -157,7 +157,6 @@ class ResendVerificationEmail(APIView):
         try:
             user = User.objects.get(email=email)
             if user.is_active:
-                action.send(user, verb='User successfully verified their email', target=User)
                 return Response({"message": "Your account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 # Check the last time an email was sent to this user
@@ -208,13 +207,10 @@ class UserCodeAPIView(APIView):
 
 
 class ReferralList(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         referrals = Referral.objects.filter(code=request.user.profile.user_code)
-        data = []
-        for referral in referrals:
-            referred_user = referral.user.user.username
-            referred_by = referral.code
-            data.append({'referred_user': referred_user, 'referred_by': referred_by})
-        return Response(data)
+        serializer = GetReferralSerializer(referrals, many=True)
+        return Response(serializer.data)

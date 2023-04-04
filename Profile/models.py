@@ -6,6 +6,7 @@ import os
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.crypto import get_random_string
+from django.utils import timezone
 # Create your models here.
 
 def generate_unique_code():
@@ -102,12 +103,13 @@ class RecentEarnings(models.Model):
 class Referral(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     code = models.CharField(max_length=7, null=True, blank=True)
+    signed_up_at = models.DateField(default=timezone.now().date())
 
 
     def __str__(self) -> str:
         referred_user = self.user.user.username
         referred_by = Profile.objects.get(user_code=self.code).user.username
-        return f"The user {referred_user} was referred by the user {referred_by}"
+        return f"The user {referred_user} was referred by the user {referred_by} at {self.signed_up_at}"
 
 
 
