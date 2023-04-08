@@ -45,3 +45,8 @@ class GetReferralSerializer(serializers.ModelSerializer):
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+
+class ForgotPasswordCheckPinSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    pin  = serializers.CharField(max_length=7)

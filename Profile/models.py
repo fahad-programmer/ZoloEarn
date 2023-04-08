@@ -74,7 +74,7 @@ class Transaction(models.Model):
 
     def check_balance(self):
         current_user_points = Wallet.objects.get(user=self.user).points
-        return self.points <= current_user_points
+        return current_user_points
         
     def deduct_balance(self):
         current_user_points = self.get_current_user_points()
@@ -117,6 +117,9 @@ class ResetPassword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=7, null=False, blank=False)
     created_at = models.DateTimeField(default=timezone.now())
+
+    def __str__(self) -> str:
+        return f"{self.user.username} requested pin that is {self.code}"
 
     
 

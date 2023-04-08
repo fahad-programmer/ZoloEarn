@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer
 from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings
 from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -268,3 +268,32 @@ class ForgotPasswordView(APIView):
 
             return Response({'message': 'An email has been sent to you with your password reset PIN.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CheckForgotPasswordPin(APIView):
+    def post(self, request, format=None):
+        serializer = ForgotPasswordCheckPinSerializer(data=request.data)
+        if serializer.is_valid():
+
+            #Checking for user email for security purpose
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({'message': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            #Checking the pin
+            pin = serializer.validated_data['pin']
+            try:
+                user_pin_reset = ResetPassword.objects.get(user=user)
+                if user_pin_reset.code == pin:
+                    return Response({'message': "Pin Verified Successfully"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message": "Invalid Pin"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except:
+                pass
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
