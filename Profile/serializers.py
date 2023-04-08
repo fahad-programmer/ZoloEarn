@@ -40,3 +40,8 @@ class GetReferralSerializer(serializers.ModelSerializer):
         model = Referral
         fields = ['referred_user', 'signed_up_at']
         read_only_fields = ['referred_user', 'signed_up_at']
+
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()

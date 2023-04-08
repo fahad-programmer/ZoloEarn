@@ -113,3 +113,20 @@ class Referral(models.Model):
 
 
 
+class ResetPassword(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=7, null=False, blank=False)
+    created_at = models.DateTimeField(default=timezone.now())
+
+    
+
+
+#Delete all the note automatically after 15 mins
+@receiver(post_save, sender=ResetPassword)
+def delete_old_reset_password_instances(**kwargs):
+    """
+    Deletes all ResetPassword instances from the database that are older than 15 minutes.
+     """
+    fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+    old_instances = ResetPassword.objects.filter(created_at__lt=fifteen_minutes_ago)
+    old_instances.delete()

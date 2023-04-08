@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer
-from .models import Transaction, Referral, Wallet, Profile, RecentEarnings
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer
+from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings
 from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -13,6 +13,12 @@ from django_email_verification import send_email
 from rest_framework.views import APIView
 from rest_framework import generics
 import time
+from django.core.mail import EmailMessage
+from django.utils.crypto import get_random_string
+from django.utils import timezone
+from django.template.loader import render_to_string
+
+
 
 
 # Store the last time an email was sent in a dictionary
@@ -176,6 +182,8 @@ class ResendVerificationEmail(APIView):
 
 
 class CheckUserActive(APIView):
+
+    #Checking for the user active condition
     def get(self, request, token, format=None):
         try:
             token_obj = Token.objects.get(key=token)
@@ -192,6 +200,8 @@ class CheckUserActive(APIView):
         
 
 class UserCodeAPIView(APIView):
+
+    #Getting this User Refferal Code
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -207,6 +217,8 @@ class UserCodeAPIView(APIView):
 
 
 class ReferralList(APIView):
+
+    #Getting the list of Refferal For the User
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -214,3 +226,45 @@ class ReferralList(APIView):
         referrals = Referral.objects.filter(code=request.user.profile.user_code)
         serializer = GetReferralSerializer(referrals, many=True)
         return Response(serializer.data)
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request, format=None):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({'message': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if there is an existing ResetPassword object for the user
+            reset_password = ResetPassword.objects.filter(user=user).first()
+
+            # If there is an existing ResetPassword object and it was created less than 15 minutes ago, return an error
+            if reset_password and timezone.now() < reset_password.created_at + timezone.timedelta(minutes=15):
+                time_diff = (reset_password.created_at + timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
+                return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Generate a new PIN and create a new ResetPassword object for the user
+            pin = get_random_string(length=6, allowed_chars='1234567890')
+            reset_password = ResetPassword.objects.create(user=user, code=pin)
+            reset_password.save()
+
+            #Sending the Email
+
+            context = {"username" : User.objects.get(email=email).username, "pin": pin}
+            email_body = render_to_string('mail/forget_email.html', context)
+
+            email = EmailMessage(
+                'Password Reset for Zolo Earn App',
+                email_body,
+                'zoloearn.llc@gmail.com',
+                to=[email]
+                )
+
+            email.content_subtype = 'html'
+            email.send()
+
+            return Response({'message': 'An email has been sent to you with your password reset PIN.'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
