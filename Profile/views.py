@@ -250,12 +250,6 @@ class ForgotPasswordView(APIView):
                 time_diff = (reset_password.created_at + timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
                 return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
-=======
-            # Delete all old ResetPassword instances
-            fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-            ResetPassword.objects.filter(created_at__lt=fifteen_minutes_ago).delete()
->>>>>>> 72d50e05c13f5cafaa38563683e4f128c1bcbe69
 
             # Generate a new PIN and create a new ResetPassword object for the user
             pin = get_random_string(length=4, allowed_chars='1234567890')
