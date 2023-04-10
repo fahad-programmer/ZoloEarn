@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+
 # Create your models here.
 
 def generate_unique_code():
@@ -115,21 +116,11 @@ class Referral(models.Model):
 
 class ResetPassword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    code = models.CharField(max_length=7, null=False, blank=False)
+    pin = models.CharField(max_length=4, null=False, blank=False, default=1)
     created_at = models.DateTimeField(default=timezone.now())
 
     def __str__(self) -> str:
-        return f"{self.user.username} requested pin that is {self.code}"
+        return f"{self.user.username} requested pin that is {self.pin}"
 
     
 
-
-#Delete all the note automatically after 15 mins
-@receiver(post_save, sender=ResetPassword)
-def delete_old_reset_password_instances(**kwargs):
-    """
-    Deletes all ResetPassword instances from the database that are older than 15 minutes.
-     """
-    fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-    old_instances = ResetPassword.objects.filter(created_at__lt=fifteen_minutes_ago)
-    old_instances.delete()

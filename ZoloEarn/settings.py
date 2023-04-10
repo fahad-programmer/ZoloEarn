@@ -209,3 +209,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ["EMAIL"]
 EMAIL_HOST_PASSWORD = os.environ["APP_PASSWORD"]  # os.environ['password_key'] suggested
 EMAIL_USE_TLS = True
+
+

@@ -230,6 +230,10 @@ class ReferralList(APIView):
 
 class ForgotPasswordView(APIView):
     def post(self, request, format=None):
+
+        #Deleting all the objects that are old than 15 mins
+        ResetPassword.objects.filter(created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
+
         serializer = ForgotPasswordSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
@@ -246,10 +250,11 @@ class ForgotPasswordView(APIView):
                 time_diff = (reset_password.created_at + timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
                 return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
 
+
             # Generate a new PIN and create a new ResetPassword object for the user
             pin = get_random_string(length=4, allowed_chars='1234567890')
-            reset_password = ResetPassword.objects.create(user=user, code=pin)
-            reset_password.save()
+            reset_password_object = ResetPassword.objects.create(user=user, pin=pin)
+            reset_password_object.save()
 
             #Sending the Email
 
@@ -275,26 +280,21 @@ class CheckForgotPasswordPin(APIView):
     def post(self, request, format=None):
         serializer = ForgotPasswordCheckPinSerializer(data=request.data)
         if serializer.is_valid():
-
-            #Checking for user email for security purpose
             email = serializer.validated_data['email']
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
                 return Response({'message': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            #Checking the pin
             pin = serializer.validated_data['pin']
             try:
-                user_pin_reset = ResetPassword.objects.get(user=user)
-                if user_pin_reset.code == pin:
-                    return Response({'message': "Pin Verified Successfully"}, status=status.HTTP_200_OK)
+                reset_password_obj = ResetPassword.objects.get(user=user)
+                if reset_password_obj.pin == pin and timezone.now() <= reset_password_obj.created_at + timezone.timedelta(minutes=15):
+                    return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
                 else:
-                    return Response({"message": "Invalid Pin"}, status=status.HTTP_400_BAD_REQUEST)
-
-            except:
-                pass
-
+                    return Response({'message': 'Invalid or expired PIN'}, status=status.HTTP_400_BAD_REQUEST)
+            except ResetPassword.DoesNotExist:
+                return Response({'message': 'No reset password request found for this user.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

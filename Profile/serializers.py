@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Transaction, Referral
+from .models import Transaction, Referral, ResetPassword
 from .models import generate_username
 
 User = get_user_model()
@@ -49,7 +49,8 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
 class ForgotPasswordCheckPinSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    pin  = serializers.CharField(max_length=7)
+    pin = serializers.CharField(max_length=4)
+
 
 class UserResetPassword(serializers.Serializer):
     email = serializers.EmailField()
