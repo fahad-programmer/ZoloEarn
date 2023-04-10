@@ -50,3 +50,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
 class ForgotPasswordCheckPinSerializer(serializers.Serializer):
     email = serializers.EmailField()
     pin  = serializers.CharField(max_length=7)
+
+class UserResetPassword(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=32)

@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword
 from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings
 from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -247,7 +247,7 @@ class ForgotPasswordView(APIView):
                 return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Generate a new PIN and create a new ResetPassword object for the user
-            pin = get_random_string(length=6, allowed_chars='1234567890')
+            pin = get_random_string(length=4, allowed_chars='1234567890')
             reset_password = ResetPassword.objects.create(user=user, code=pin)
             reset_password.save()
 
@@ -296,4 +296,39 @@ class CheckForgotPasswordPin(APIView):
                 pass
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserResetPasswordView(APIView):
+    def post(self, request, format=None):
+        serializer = UserResetPassword(data=request.data)
+
+
+        #Setting the password and validating the inputs
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            password = serializer.validated_data[password]
+
+            get_user = User.objects.get(email=email)
+            get_user.set_password(password)
+            get_user.save()
+
+
+            #Sending email to the user
+            context = {"username" : User.objects.get(email=email).username}
+            email_body = render_to_string('mail/password_change_notification.html', context)
+
+            email = EmailMessage(
+                'Password Reset Succesful',
+                email_body,
+                'zoloearn.llc@gmail.com',
+                to=[email]
+                )
+
+            email.content_subtype = 'html'
+            email.send()
+
+
+
+            Response({"message", "Password Set Successfully Please Log In"}, status=status.HTTP_200_OK)
+
 
