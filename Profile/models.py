@@ -116,20 +116,26 @@ class Referral(models.Model):
 class ResetPassword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=7, null=False, blank=False)
-    created_at = models.DateTimeField(default=timezone.now())
+    created_at = models.DateTimeField(default=timezone.now)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.user.username} requested pin that is {self.code}"
 
-    
+    def save(self, *args, **kwargs):
+        # Check if there is an existing ResetPassword object for the user
+        reset_password = ResetPassword.objects.filter(user=self.user).first()
 
+        # If there is an existing ResetPassword object and it was created less than 15 minutes ago, raise an error
+        if reset_password and timezone.now() < reset_password.created_at + timezone.timedelta(minutes=15):
+            raise ValidationError('Please wait 15 minutes before requesting a new PIN.')
 
-#Delete all the note automatically after 15 mins
+        # Save the new ResetPassword object
+        super().save(*args, **kwargs)
+
 @receiver(post_save, sender=ResetPassword)
-def delete_old_reset_password_instances(**kwargs):
+def delete_old_reset_password_instances(sender, **kwargs):
     """
     Deletes all ResetPassword instances from the database that are older than 15 minutes.
-     """
+    """
     fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-    old_instances = ResetPassword.objects.filter(created_at__lt=fifteen_minutes_ago)
-    old_instances.delete()
+    ResetPassword.objects.filter(created_at__lt=fifteen_minutes_ago).delete()
