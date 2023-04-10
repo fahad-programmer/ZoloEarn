@@ -247,7 +247,7 @@ class ForgotPasswordView(APIView):
                 return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Generate a new PIN and create a new ResetPassword object for the user
-            pin = get_random_string(length=6, allowed_chars='1234567890')
+            pin = get_random_string(length=4, allowed_chars='1234567890')
             reset_password = ResetPassword.objects.create(user=user, code=pin)
             reset_password.save()
 
