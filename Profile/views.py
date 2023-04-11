@@ -62,8 +62,8 @@ class UserViewSet(viewsets.ModelViewSet):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
-        token, created = Token.objects.get_or_create(user=user)
         if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
             if user.is_active:
                 return Response({'token': token.key, "message" : "verified"})
             else:
