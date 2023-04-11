@@ -328,6 +328,6 @@ class UserResetPasswordView(APIView):
 
 
 
-            return Response({"message", "Password Set Successfully Please Log In"}, status=status.HTTP_200_OK)
+            return Response({"message": "Password Set Successfully Please Log In"}, status=status.HTTP_200_OK)
 
 
