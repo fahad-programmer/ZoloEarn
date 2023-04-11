@@ -304,8 +304,9 @@ class UserResetPasswordView(APIView):
         #Setting the password and validating the inputs
         if serializer.is_valid():
             email = serializer.validated_data['email']
-            password = serializer.validated_data[password]
+            password = serializer.validated_data['password']
 
+            #Setting the user password
             get_user = User.objects.get(email=email)
             get_user.set_password(password)
             get_user.save()
