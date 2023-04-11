@@ -287,7 +287,7 @@ class CheckForgotPasswordPin(APIView):
             pin = serializer.validated_data['pin']
             try:
                 reset_password_obj = ResetPassword.objects.get(user=user)
-                if reset_password_obj.pin == pin:
+                if reset_password_obj.pin == pin and timezone.now() <= reset_password_obj.created_at + timezone.timedelta(minutes=15):
                     return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
                 else:
                     return Response({'message': 'Invalid or expired PIN'}, status=status.HTTP_400_BAD_REQUEST)
