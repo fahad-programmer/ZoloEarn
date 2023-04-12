@@ -7,39 +7,88 @@ from Profile.models import RecentEarnings
 from datetime import timedelta, timezone
 from datetime import timedelta
 from django.utils import timezone
-
-
+from .models import SpinWheel, MonsterHunter, TickTacToe
 
 
 User = get_user_model()
+
 
 class SpinWheelView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args, **kwargs):
+
+        # Getting the spinwheel object
+        user_spin_object = SpinWheel.objects.get(user=request.user)
+
+        # Check if the user has any spin available
+        if user_spin_object.spin_available == 0:
+            # Check if the user last played the spin wheel less than 24 hours ago
+            last_played_at = user_spin_object.last_played_at
+            time_since_last_played = timezone.now() - last_played_at
+            if time_since_last_played.days < 1:
+                # Return a response indicating that the user should come back tomorrow
+                return Response({"message": "Please come back tomorrow to play again."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Reset the number of spins available to 1 if the user has not played in the last 24 hours
+            user_spin_object.spin_available = 1
+            user_spin_object.save()
+
+        # Continue with the normal flow if the user has spins available or has not played in the last 24 hours
         # Get the number of points earned from the spin wheel from the POST request data
         points = request.data.get('points')
-        if not points:
-            return Response({'message': 'Points parameter is missing'}, status=400)
 
-        # Get the authenticated user from the request
-        user = request.user
+        # Rest of the code to handle points earned goes here...
 
-        user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Spin Wheel", point_earned=points)
-        user_recent_earning.save()
+        # Adding Some Checks
+        if points == 0:
 
-        # Add the points to the user's account
-        user_wallet = Wallet.objects.get(user=user)
-        user_wallet.points += points
-        user_wallet.save()
+            user_spin_object.spin_available -= 1
+            user_spin_object.save()
 
-        return Response({'message': f'{points} points added to your account.'}, status=200)
+            return Response({"message": "better luck next time"}, status=status.HTTP_200_OK)
 
+        elif points == 11:
+            return Response({"message": "free turn"}, status=status.HTTP_200_OK)
 
+        elif points == 22:
 
+            user_spin_object.spin_available -= 1
+            user_spin_object.save()
 
+            userMonsterHunt = MonsterHunter.objects.get(user=request.user)
+            userMonsterHunt.turn_available += 1
+            userMonsterHunt.save()
+            return Response({"message": "free monster hunt turn"}, status=status.HTTP_200_OK)
 
-from datetime import timedelta
+        elif points == 33:
+
+            user_spin_object.spin_available -= 1
+            user_spin_object.save()
+
+            userTickTacToe = TickTacToe.objects.get(user=request.user)
+            userTickTacToe.turn_available += 1
+            userTickTacToe.save()
+            return Response({"message": "free monster hunt turn"}, status=status.HTTP_200_OK)
+
+        else:
+            # Get the authenticated user from the request
+            user = request.user
+
+            user_spin_object.spin_available -= 1
+            user_spin_object.save()
+
+            user_recent_earning = RecentEarnings.objects.create(
+                user=user, way_to_earn="Spin Wheel", point_earned=points)
+            user_recent_earning.save()
+
+            # Add the points to the user's account
+            user_wallet = Wallet.objects.get(user=user)
+            user_wallet.points += points
+            user_wallet.save()
+
+            return Response({'message': f'{points} points added to your account.'}, status=status.HTTP_200_OK)
+
 
 class DailyCheckIn(APIView):
     authentication_classes = [TokenAuthentication]
@@ -49,7 +98,8 @@ class DailyCheckIn(APIView):
         user = request.user
 
         # Check when the user last claimed the award
-        last_claimed = RecentEarnings.objects.filter(user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
+        last_claimed = RecentEarnings.objects.filter(
+            user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
 
         if last_claimed and last_claimed.created_at > timezone.now() - timedelta(hours=24):
             # User has already claimed the award in the last 24 hours
@@ -60,13 +110,11 @@ class DailyCheckIn(APIView):
         user_wallet.points += 50
         user_wallet.save()
 
-        RecentEarnings.objects.create(user=user, way_to_earn="Daily Check-In", point_earned=50)
+        RecentEarnings.objects.create(
+            user=user, way_to_earn="Daily Check-In", point_earned=50)
 
         return Response({'message': f'{50} points added to your account.'}, status=200)
 
-
-  
-    
 
 class WalletView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -83,3 +131,46 @@ class WalletView(APIView):
 
         # Return the current points in the user's wallet
         return Response({'message': str(user_wallet.points)}, status=status.HTTP_200_OK)
+
+
+"""#Getting the user spin wheel object
+        UserWheel = SpinWheel.objects.get(user=request.user)
+        if UserWheel.spin_available > 0:
+            # Get the number of points earned from the spin wheel from the POST request data
+            points = request.data.get('points')
+
+            #Adding Some Checks
+            if points == 0:
+                return Response({"message": "better luck next time"}, status=status.HTTP_200_OK)
+            
+            elif points == 11:
+                return Response({"message": "free turn"}, status=status.HTTP_200_OK)
+
+            elif points == 22:
+                userMonsterHunt = MonsterHunter.objects.get(user=request.user)
+                userMonsterHunt.turn_available += 1
+                userMonsterHunt.save()
+                return Response({"message": "free monster hunt turn"}, status=status.HTTP_200_OK)
+            
+            elif points == 33:
+                userTickTacToe = TickTacToe.objects.get(user=request.user)
+                userTickTacToe.turn_available += 1
+                userTickTacToe.save()
+                return Response({"message": "free monster hunt turn"}, status=status.HTTP_200_OK)
+            
+            else:
+                # Get the authenticated user from the request
+                user = request.user
+
+                UserWheel.spin_available -= 1
+                UserWheel.save()
+
+                user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Spin Wheel", point_earned=points)
+                user_recent_earning.save()
+
+                # Add the points to the user's account
+                user_wallet = Wallet.objects.get(user=user)
+                user_wallet.points += points
+                user_wallet.save()
+
+                return Response({'message': f'{points} points added to your account.'}, status=200)"""

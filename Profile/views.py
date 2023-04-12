@@ -44,9 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.is_active = False
             user.save()
             send_email(user)
-
-        except IntegrityError:
-            return Response({"message": "Username or email is already in use"}, status=status.HTTP_400_BAD_REQUEST)
+            
         except ValidationError:
             return Response({"message":"Invalid Data Check Your Input Please"})
 
