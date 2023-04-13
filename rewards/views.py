@@ -133,44 +133,40 @@ class WalletView(APIView):
         return Response({'message': str(user_wallet.points)}, status=status.HTTP_200_OK)
 
 
-"""#Getting the user spin wheel object
-        UserWheel = SpinWheel.objects.get(user=request.user)
-        if UserWheel.spin_available > 0:
-            # Get the number of points earned from the spin wheel from the POST request data
-            points = request.data.get('points')
+class UserSpinTurn(APIView):
 
-            #Adding Some Checks
-            if points == 0:
-                return Response({"message": "better luck next time"}, status=status.HTTP_200_OK)
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        # Get the authenticated user from the request
+        user = request.user
+
+        # Get the user's wallet
+        try:
+            userWheelObject = SpinWheel.objects.get(user=user)
+        except Wallet.DoesNotExist:
+            return Response({'message': 'Spin Wheel Object Failed'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Return the current points in the user's wallet
+        return Response({'message': str(userWheelObject.spin_available)}, status=status.HTTP_200_OK)
+
+
+class UserSpinFree(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        # Get the authenticated user from the request
+        user = request.user
+
+        # Get the user's wallet
+        try:
+            userWheelObject = SpinWheel.objects.get(user=user)
+            userWheelObject.spin_available += 1
+            userWheelObject.save()
             
-            elif points == 11:
-                return Response({"message": "free turn"}, status=status.HTTP_200_OK)
+        except Wallet.DoesNotExist:
+            return Response({'message': 'Spin Wheel Object Failed'}, status=status.HTTP_400_BAD_REQUEST)
 
-            elif points == 22:
-                userMonsterHunt = MonsterHunter.objects.get(user=request.user)
-                userMonsterHunt.turn_available += 1
-                userMonsterHunt.save()
-                return Response({"message": "free monster hunt turn"}, status=status.HTTP_200_OK)
-            
-            elif points == 33:
-                userTickTacToe = TickTacToe.objects.get(user=request.user)
-                userTickTacToe.turn_available += 1
-                userTickTacToe.save()
-                return Response({"message": "free monster hunt turn"}, status=status.HTTP_200_OK)
-            
-            else:
-                # Get the authenticated user from the request
-                user = request.user
-
-                UserWheel.spin_available -= 1
-                UserWheel.save()
-
-                user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Spin Wheel", point_earned=points)
-                user_recent_earning.save()
-
-                # Add the points to the user's account
-                user_wallet = Wallet.objects.get(user=user)
-                user_wallet.points += points
-                user_wallet.save()
-
-                return Response({'message': f'{points} points added to your account.'}, status=200)"""
+        # Return the current points in the user's wallet
+        return Response({'message': str(userWheelObject.spin_available)}, status=status.HTTP_200_OK)
