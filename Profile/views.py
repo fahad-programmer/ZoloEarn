@@ -2,11 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword
 from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from django_email_verification import send_email
@@ -26,16 +25,26 @@ last_email_sent = {}
 
 User = get_user_model()
 
+ALLOWED_EMAIL_PROVIDERS = ["tutanota.com","protonmail.com", "zoho.com", "hubspot.com", "mail.com", "gmx.com", "yandex.com","pm.com",'gmail.com', 'yahoo.com', 'icloud.com', "outlook.com", "hotmail.com", "aol.com", "aim.com", "titan.email"]
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if email:
+            domain = email.split('@')[1]
+            if domain not in ALLOWED_EMAIL_PROVIDERS:
+                return Response({"message":"Signups from this email provider are not allowed."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message":"Please provide an email address."}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-            if User.objects.filter(email=request.data['email']).exists():
-                return Response({"message":"Email Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(email=email).exists():
+                return Response({"message":"Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
 
@@ -46,14 +55,14 @@ class UserViewSet(viewsets.ModelViewSet):
             send_email(user)
             
         except ValidationError:
-            return Response({"message":"Invalid Data Check Your Input Please"})
+            return Response({"message":"Invalid data. Please check your input."})
 
         # Generate a token for the newly created user
         user = User.objects.get(pk=serializer.data['id'])
         token, created = Token.objects.get_or_create(user=user)
 
         # Return the token in the response
-        return Response({'token': token.key, "message":"Account Created"}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'token': token.key, "message":"Account created."}, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def login(self, request, *args, **kwargs):
