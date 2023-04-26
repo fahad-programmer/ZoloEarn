@@ -1,7 +1,8 @@
+from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword
-from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username
+from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -16,6 +17,8 @@ from django.core.mail import EmailMessage
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.template.loader import render_to_string
+
+
 
 
 
@@ -338,3 +341,66 @@ class UserResetPasswordView(APIView):
             return Response({"message": "Password Set Successfully Please Log In"}, status=status.HTTP_200_OK)
 
 
+class SocialAccountApi(viewsets.ModelViewSet):
+    serializer_class = SocialAccountSerializer
+
+    def create(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+
+            first_name = serializer.validated_data['first_name']
+            email = serializer.validated_data['email']
+        else:
+            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+
+        userQuerySet = User.objects.filter(email=email)
+
+        if userQuerySet.exists():
+            return Response({"message":"Email Already Exists In Database"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            #First creating the simple User object and generating a username
+            userObjectUsername = generate_username(email=email)
+            userObject = User.objects.create(email=email, first_name=first_name, username=userObjectUsername)
+            userObject.save()
+
+            #Now Creating a social account
+            userObjectSocialAccount = SocialAccount.objects.create(user=userObject)
+            userObjectSocialAccount.save()
+
+            #Generating token for user
+            token, created = Token.objects.get_or_create(user=userObject)
+
+            return Response({"token": token.key, "message":"Account Created"}, status=status.HTTP_200_OK)
+        
+    def login(self, request, format=None):
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            #Getting email
+            email = serializer.validated_data["email"]
+
+            userObject = User.objects.filter(email=email).first()
+            userSocialObject = SocialAccount.objects.filter(user=userObject)
+
+            if userObject:
+                if userSocialObject.exists():
+                    #Generating user for user
+                    token, created = Token.objects.get_or_create(user=userObject)
+                    return Response({"token":token.key, "message":"Account Logged In"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message": "Login Through Email And Password"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            else:
+                return Response({"message": "No Account Found In Database"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        else:
+            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+    
+           
+       
+           
