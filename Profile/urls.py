@@ -19,6 +19,15 @@ urlpatterns = [
     path('get-user-code', views.UserCodeAPIView.as_view(), name="userCode"),
     path('password-reset', views.ForgotPasswordView.as_view()),
     path('password-reset-pin-verify', views.CheckForgotPasswordPin.as_view()),
-    path('reset-password-complete', views.UserResetPasswordView.as_view(), name="password-forget-complete")
+    path('reset-password-complete', views.UserResetPasswordView.as_view(), name="password-forget-complete"),
+
+    #Social Authentication Links
+    path('users-social-signup', views.SocialAccountApi.as_view({
+        'post': 'create'
+    })),
+
+    path('users-social-login', views.SocialAccountApi.as_view({
+        'post': 'login'
+    })),
 
    ]

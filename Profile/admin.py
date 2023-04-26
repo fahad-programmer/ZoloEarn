@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Wallet, Transaction, Referral, RecentEarnings, ResetPassword
+from .models import Profile, Wallet, Transaction, Referral, RecentEarnings, ResetPassword, SocialAccount
 
 # Register your models here.
 admin.site.register(Profile)
@@ -8,3 +8,4 @@ admin.site.register(Transaction)
 admin.site.register(Referral)
 admin.site.register(RecentEarnings)
 admin.site.register(ResetPassword)
+admin.site.register(SocialAccount)

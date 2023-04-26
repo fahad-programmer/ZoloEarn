@@ -36,7 +36,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["web-production-e008.up.railway.app", "*"]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -61,6 +61,7 @@ INSTALLED_APPS = [
 
     #Email Verification
     'django_email_verification',
+
 ]
 
 MIDDLEWARE = [
@@ -105,6 +106,10 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+
+
 
 #Sentry Error Tracking
 sentry_sdk.init(
@@ -184,7 +189,6 @@ AUTHENTICATION_BACKENDS = [
 
     # specific authentication methods, such as login by e-mail
     'ZoloEarn.backend.EmailBackend',
-
 ]
 
 #Email Verification Settings
@@ -209,5 +213,3 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ["EMAIL"]
 EMAIL_HOST_PASSWORD = os.environ["APP_PASSWORD"]  # os.environ['password_key'] suggested
 EMAIL_USE_TLS = True
-
-

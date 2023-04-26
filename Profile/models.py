@@ -123,4 +123,9 @@ class ResetPassword(models.Model):
         return f"{self.user.username} requested pin that is {self.pin}"
 
 
-   
+class SocialAccount(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.user.username} created account using google"
