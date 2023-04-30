@@ -8,6 +8,7 @@ from datetime import timedelta, timezone
 from datetime import timedelta
 from django.utils import timezone
 from .models import SpinWheel, MonsterHunter, TickTacToe
+from django.utils import timezone as django_timezone
 
 
 User = get_user_model()
@@ -20,19 +21,6 @@ class SpinWheelView(APIView):
 
         # Getting the spinwheel object
         user_spin_object = SpinWheel.objects.get(user=request.user)
-
-        # Check if the user has any spin available
-        if user_spin_object.spin_available == 0:
-            # Check if the user last played the spin wheel less than 24 hours ago
-            last_played_at = user_spin_object.last_played_at
-            time_since_last_played = timezone.now() - last_played_at
-            if time_since_last_played.days < 1:
-                # Return a response indicating that the user should come back tomorrow
-                return Response({"message": "Please come back tomorrow to play again."}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Reset the number of spins available to 1 if the user has not played in the last 24 hours
-            user_spin_object.spin_available = 1
-            user_spin_object.save()
 
         # Continue with the normal flow if the user has spins available or has not played in the last 24 hours
         # Get the number of points earned from the spin wheel from the POST request data
@@ -138,16 +126,21 @@ class UserSpinTurn(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
-        # Get the authenticated user from the request
         user = request.user
 
-        # Get the user's wallet
+        # Get the user's spin wheel object
         try:
             userWheelObject = SpinWheel.objects.get(user=user)
-        except Wallet.DoesNotExist:
+            last_spin_time = userWheelObject.last_spin_at
+            current_time = django_timezone.now()
+            time_since_last_spin = current_time - last_spin_time
+            if time_since_last_spin >= timedelta(hours=24):
+                userWheelObject.spin_available = 1
+                userWheelObject.save()
+        except SpinWheel.DoesNotExist:
             return Response({'message': 'Spin Wheel Object Failed'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Return the current points in the user's wallet
+        # Return the current spins available for the user
         return Response({'message': str(userWheelObject.spin_available)}, status=status.HTTP_200_OK)
 
 
@@ -170,3 +163,61 @@ class UserSpinFree(APIView):
 
         # Return the current points in the user's wallet
         return Response({'message': str(userWheelObject.spin_available)}, status=status.HTTP_200_OK)
+
+
+class userTTCAvailabeTurn(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        #Getting user turns
+        try:
+            userTTCObject = TickTacToe.objects.get(user=user)
+            last_played_time = userTTCObject.last_played_at
+            current_time = django_timezone.now()
+            time_since_last_played = current_time - last_played_time
+            if time_since_last_played >= timedelta(hours=24):
+                userTTCObject.turn_available = 1
+                userTTCObject.save()
+            return Response({"message": str(userTTCObject.turn_available)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class addUserTTCTurn(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        #Adding the user turns
+        userTTCObject = TickTacToe.objects.get(user=user)
+        userTTCObject.turn_available += 1
+        userTTCObject.save()
+
+        #Returning Response
+        return Response({"message":"Free Turn Given"}, status=status.HTTP_200_OK)
+
+
+class TTCApiView(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        #Adding entry to recent earnings
+        user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Tic Tac Toe", point_earned=50)
+        user_recent_earning.save()
+
+        #Now adding points to the user wallet ()
+        userWallet = Wallet.objects.get(user=user)
+        userWallet.points += 50
+        userWallet.save()
+
+        return Response({"message" : "Points Added To The Wallet"}, status=status.HTTP_200_OK)
+    
+
