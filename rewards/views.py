@@ -131,7 +131,7 @@ class UserSpinTurn(APIView):
         # Get the user's spin wheel object
         try:
             userWheelObject = SpinWheel.objects.get(user=user)
-            last_spin_time = userWheelObject.last_spin_at
+            last_spin_time = userWheelObject.last_played_at
             current_time = django_timezone.now()
             time_since_last_spin = current_time - last_spin_time
             if time_since_last_spin >= timedelta(hours=24):
@@ -157,7 +157,7 @@ class UserSpinFree(APIView):
             userWheelObject = SpinWheel.objects.get(user=user)
             userWheelObject.spin_available += 1
             userWheelObject.save()
-            
+
         except Wallet.DoesNotExist:
             return Response({'message': 'Spin Wheel Object Failed'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,7 +184,7 @@ class userTTCAvailabeTurn(APIView):
             return Response({"message": str(userTTCObject.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 class addUserTTCTurn(APIView):
 
@@ -209,6 +209,11 @@ class TTCApiView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
 
+        #TTC Object
+        userTTCObject = TickTacToe.objects.get(user=user)
+        userTTCObject.turn_available -= 1
+        userTTCObject.save()
+
         #Adding entry to recent earnings
         user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Tic Tac Toe", point_earned=50)
         user_recent_earning.save()
@@ -219,5 +224,18 @@ class TTCApiView(APIView):
         userWallet.save()
 
         return Response({"message" : "Points Added To The Wallet"}, status=status.HTTP_200_OK)
-    
 
+
+class TTCLoseApi(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        #TTC Object
+        userTTCObject = TickTacToe.objects.get(user=user)
+        userTTCObject.turn_available -= 1
+        userTTCObject.save()
+
+        return Respose({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
