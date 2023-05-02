@@ -238,4 +238,4 @@ class TTCLoseApi(APIView):
         userTTCObject.turn_available -= 1
         userTTCObject.save()
 
-        return Respose({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
