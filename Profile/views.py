@@ -336,8 +336,6 @@ class UserResetPasswordView(APIView):
             email.content_subtype = 'html'
             email.send()
 
-
-
             return Response({"message": "Password Set Successfully Please Log In"}, status=status.HTTP_200_OK)
 
 

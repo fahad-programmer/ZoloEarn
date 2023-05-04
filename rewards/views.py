@@ -9,6 +9,9 @@ from datetime import timedelta
 from django.utils import timezone
 from .models import SpinWheel, MonsterHunter, TickTacToe
 from django.utils import timezone as django_timezone
+from django.db.models import Sum
+from .serializers import UserStatsSerializer
+from rest_framework import generics
 
 
 User = get_user_model()
@@ -239,3 +242,13 @@ class TTCLoseApi(APIView):
         userTTCObject.save()
 
         return Response({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AllUserStats(generics.ListAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    serializer_class = UserStatsSerializer
+
+    def get_queryset(self):
+        return User.objects.annotate(points=Sum('wallet__points')).order_by('-points')
+
