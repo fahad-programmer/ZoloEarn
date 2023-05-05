@@ -250,5 +250,5 @@ class AllUserStats(generics.ListAPIView):
     serializer_class = UserStatsSerializer
 
     def get_queryset(self):
-        return User.objects.annotate(points=Sum('wallet__points')).order_by('-points')
+        return User.objects.annotate(points=Sum('wallet__points')).order_by('-points')[:50]
 
