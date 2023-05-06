@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Transaction, Referral, ResetPassword
-from .models import generate_username
+from .models import generate_username, Profile
 
 User = get_user_model()
 
@@ -61,3 +61,20 @@ class SocialAccountSerializer(serializers.Serializer):
     email =  serializers.EmailField()
     first_name = serializers.CharField(max_length=50)
     
+
+class UserStatsSerializer(serializers.ModelSerializer):
+    wallet_points = serializers.IntegerField(source='wallet.points')
+    profile_pic_path = serializers.CharField(source='profile.profile_pic_path')
+    rank = serializers.IntegerField(source='user_rank', read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'wallet_points', 'profile_pic_path', 'rank']
+
+
+class ProfileImageSerializer(serializers.ModelSerializer):
+    profile_pic_path = serializers.CharField(max_length=1000)
+
+    class Meta:
+        model = Profile
+        fields = ["profile_pic_path"]

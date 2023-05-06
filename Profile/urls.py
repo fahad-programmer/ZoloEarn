@@ -29,5 +29,6 @@ urlpatterns = [
     path('users-social-login', views.SocialAccountApi.as_view({
         'post': 'login'
     })),
-
+    path('userStats', views.AllUserStats.as_view()),
+    path("profile-image-select", views.ProfileImageSelector.as_view())
    ]

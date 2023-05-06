@@ -12,5 +12,5 @@ urlpatterns = [
     path("add-ttc-turn", views.addUserTTCTurn.as_view()),
     path('ttc-turn', views.TTCApiView.as_view()),
     path('ttc-user-lose', views.TTCLoseApi.as_view()),
-    path('userStats', views.AllUserStats.as_view())
+
 ]

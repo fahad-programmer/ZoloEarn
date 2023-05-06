@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username
+from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
 from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -17,6 +17,9 @@ from django.core.mail import EmailMessage
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.template.loader import render_to_string
+from django.db.models import Sum
+from django.db.models import F, Window
+from django.db.models.functions import Rank
 
 
 
@@ -31,33 +34,63 @@ User = get_user_model()
 ALLOWED_EMAIL_PROVIDERS = ["tutanota.com","protonmail.com", "zoho.com", "hubspot.com", "mail.com", "gmx.com", "yandex.com","pm.com",'gmail.com', 'yahoo.com', 'icloud.com', "outlook.com", "hotmail.com", "aol.com", "aim.com", "titan.email"]
 
 class UserViewSet(viewsets.ModelViewSet):
+    # Get all users
     queryset = User.objects.all()
+    # UserSerializer used to serialize/deserialize User objects
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
+        # Get email and device_id from request data
         email = request.data.get('email')
+        device_id = request.data.get('device_id')
+
+        # If email is present, check if it belongs to an allowed provider
         if email:
             domain = email.split('@')[1]
             if domain not in ALLOWED_EMAIL_PROVIDERS:
+                # Return an error response if email provider is not allowed
                 return Response({"message":"Signups from this email provider are not allowed."}, status=status.HTTP_400_BAD_REQUEST)
         else:
+            # Return an error response if email is not provided
             return Response({"message":"Please provide an email address."}, status=status.HTTP_400_BAD_REQUEST)
 
+        #Checking Profile Database for the device id
+        check_profile_data = Profile.objects.filter(device_id=device_id)
+        if len(check_profile_data) == 3: #If more than 3 accounts found error is returned
+            return Response({"message": "No More Accounts Can Be Created On This Device"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        # Create a UserSerializer instance with request data
         serializer = self.get_serializer(data=request.data)
+
         try:
+            # Raise a validation error if serializer data is invalid
             serializer.is_valid(raise_exception=True)
+
+            # Check if user with the same email already exists
             if User.objects.filter(email=email).exists():
+                # Return an error response if email is already taken
                 return Response({"message":"Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Save the newly created user
             self.perform_create(serializer)
+
+            # Get response headers
             headers = self.get_success_headers(serializer.data)
 
-            # Set user as active
+            # Set user as inactive and send an email to activate the account
             user = User.objects.get(pk=serializer.data['id'])
             user.is_active = False
             user.save()
             send_email(user)
+
+            # Save device_id in Profile model
+            profile = Profile.objects.get(user=user)
+            profile.device_id = device_id
+            profile.save()
             
         except ValidationError:
+            # Return an error response if serializer data is invalid
             return Response({"message":"Invalid data. Please check your input."})
 
         # Generate a token for the newly created user
@@ -100,7 +133,7 @@ class TransactionListCreateView(generics.ListCreateAPIView):
         payment_method = serializer.validated_data['payment_method']
         transaction = Transaction(user=user, points=points, payment_method=payment_method)
         if transaction.check_balance():
-            transaction.save()
+            serializer.save()
             wallet = Wallet.objects.get(user=user)
             wallet.points -= points
             wallet.save()
@@ -397,8 +430,44 @@ class SocialAccountApi(viewsets.ModelViewSet):
 
 
 
+class AllUserStats(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    serializer_class = UserStatsSerializer
 
-    
-           
+    def get_queryset(self):
+        top_users = User.objects.annotate(
+            points=Sum('wallet__points'),
+            user_rank=Window(
+                expression=Rank(),
+                order_by=[F('wallet__points').desc(), 'id']
+            )
+        )[:50]
+
+        return top_users
+
+
+
+
        
            
+class ProfileImageSelector(APIView):
+    authentication_classes = [TokenAuthentication]
+    serializer_class = ProfileImageSerializer
+
+    def post(self, request, *args, **kwargs):
+
+        #Getting the user profile 
+        get_profile_user = Profile.objects.get(user=request.user)
+
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            #The image Path
+            image_path = serializer.validated_data["profile_pic_path"]
+            get_profile_user.profile_pic_path = image_path
+            get_profile_user.save()
+
+            return Response({"message":"Profile Pic Succesfully Selected"}, status=status.HTTP_200_OK)
+        
+        else:
+            return Response({"message":"Some Error Occured Try Again Later"}, status=status.HTTP_400_BAD_REQUEST)
+

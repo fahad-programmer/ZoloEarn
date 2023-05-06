@@ -244,11 +244,5 @@ class TTCLoseApi(APIView):
         return Response({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AllUserStats(generics.ListAPIView):
 
-    authentication_classes = [TokenAuthentication]
-    serializer_class = UserStatsSerializer
-
-    def get_queryset(self):
-        return User.objects.annotate(points=Sum('wallet__points')).order_by('-points')[:50]
 
