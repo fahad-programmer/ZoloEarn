@@ -404,6 +404,11 @@ class SocialAccountApi(viewsets.ModelViewSet):
             #Now Creating a social account
             userObjectSocialAccount = SocialAccount.objects.create(user=userObject)
             userObjectSocialAccount.save()
+            
+            # Save device_id in Profile model
+            profile = Profile.objects.get(user=user)
+            profile.device_id = device_id
+            profile.save()
 
             #Generating token for user
             token, created = Token.objects.get_or_create(user=userObject)
