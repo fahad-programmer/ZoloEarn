@@ -60,6 +60,7 @@ class UserResetPassword(serializers.Serializer):
 class SocialAccountSerializer(serializers.Serializer):
     email =  serializers.EmailField()
     first_name = serializers.CharField(max_length=50)
+    deviceId = serializers.CharField(max_length=500)
     
 
 class UserStatsSerializer(serializers.ModelSerializer):
