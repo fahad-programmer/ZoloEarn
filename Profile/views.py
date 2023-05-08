@@ -381,10 +381,17 @@ class SocialAccountApi(viewsets.ModelViewSet):
 
             first_name = serializer.validated_data['first_name']
             email = serializer.validated_data['email']
+            device_id = serializer.validated_data['device_id']
         else:
             return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
 
         userQuerySet = User.objects.filter(email=email)
+        
+        #Checking Profile Database for the device id
+        check_profile_data = Profile.objects.filter(device_id=device_id)
+        if len(check_profile_data) == 3: #If more than 3 accounts found error is returned
+            return Response({"message": "No More Accounts Can Be Created On This Device"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
         if userQuerySet.exists():
             return Response({"message":"Email Already Exists In Database"}, status=status.HTTP_400_BAD_REQUEST)
