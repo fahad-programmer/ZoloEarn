@@ -378,37 +378,37 @@ class SocialAccountApi(viewsets.ModelViewSet):
     def create(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-
             first_name = serializer.validated_data['first_name']
             email = serializer.validated_data['email']
             device_id = serializer.validated_data['device_id']
         else:
             return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
 
         userQuerySet = User.objects.filter(email=email)
-        
-        #Checking Profile Database for the device id
-        check_profile_data = Profile.objects.filter(device_id=device_id)
-        if len(check_profile_data) == 3: #If more than 3 accounts found error is returned
-            return Response({"message": "No More Accounts Can Be Created On This Device"}, status=status.HTTP_400_BAD_REQUEST)
-        
 
         if userQuerySet.exists():
             return Response({"message":"Email Already Exists In Database"}, status=status.HTTP_400_BAD_REQUEST)
-        else:
+        else:        
+            #Checking Profile Database for the device id
+            check_profile_data = Profile.objects.filter(device_id=device_id)
+            if len(check_profile_data) == 3: #If more than 3 accounts found error is returned
+                return Response({"message": "No More Accounts Can Be Created On This Device"}, status=status.HTTP_400_BAD_REQUEST)             
+            
             #First creating the simple User object and generating a username
             userObjectUsername = generate_username(email=email)
             userObject = User.objects.create(email=email, first_name=first_name, username=userObjectUsername)
             userObject.save()
+            
+            # Save device_id in Profile model
+            profile = Profile.objects.get(user=userObject)
+            profile.device_id = device_id
+            profile.save()
 
             #Now Creating a social account
             userObjectSocialAccount = SocialAccount.objects.create(user=userObject)
             userObjectSocialAccount.save()
-            
-            # Save device_id in Profile model
-            profile = Profile.objects.get(user=user)
-            profile.device_id = device_id
-            profile.save()
 
             #Generating token for user
             token, created = Token.objects.get_or_create(user=userObject)
@@ -441,7 +441,6 @@ class SocialAccountApi(viewsets.ModelViewSet):
 
 
 
-
 class AllUserStats(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = UserStatsSerializer
@@ -457,11 +456,7 @@ class AllUserStats(generics.ListAPIView):
 
         return top_users
 
-
-
-
-       
-           
+     
 class ProfileImageSelector(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = ProfileImageSerializer
