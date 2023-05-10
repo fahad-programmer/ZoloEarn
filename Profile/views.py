@@ -116,29 +116,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 
-class TransactionListCreateView(generics.ListCreateAPIView):
+class TransactionListView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
     
     def get_queryset(self):
         user = self.request.user
         return Transaction.objects.filter(user=user)
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        points = serializer.validated_data['points']
-        payment_method = serializer.validated_data['payment_method']
-        transaction = Transaction(user=user, points=points, payment_method=payment_method)
-        if transaction.check_balance():
-            serializer.save()
-            wallet = Wallet.objects.get(user=user)
-            wallet.points -= points
-            wallet.save()
-        else:
-            raise ValidationError('Insufficient balance')
         
 
 class ReferralView(APIView):

@@ -63,21 +63,7 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     points = models.IntegerField(default=0, null=True, blank=True)
     payment_method = models.CharField(max_length=100, default="Easypaisa")
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-
-    def check_balance(self):
-        current_user_points = Wallet.objects.get(user=self.user).points
-        return current_user_points
-        
-    def deduct_balance(self):
-        current_user_points = self.get_current_user_points()
-        current_user_points -= self.points
-        wallet = Wallet.objects.get(user=self.user)
-        wallet.points = current_user_points
-        wallet.save()
-
-    def get_current_user_points(self):
-        return Wallet.objects.get(user=self.user).points
+    created_at = models.DateField(default=timezone.now().date())
 
     def __str__(self) -> str:
         return f"{self.user.username} made a transaction of {self.points} points via {self.payment_method}"
