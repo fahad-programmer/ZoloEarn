@@ -74,8 +74,8 @@ class UserStatsSerializer(serializers.ModelSerializer):
 
 
 class ProfileImageSerializer(serializers.ModelSerializer):
-    profile_pic_path = serializers.CharField(max_length=1000)
+    profile_pic_name = serializers.CharField(max_length=1000)
 
     class Meta:
         model = Profile
-        fields = ["profile_pic_path"]
+        fields = ["profile_pic_name"]

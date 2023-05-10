@@ -454,7 +454,7 @@ class ProfileImageSelector(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             #The image Path
-            image_path = serializer.validated_data["profile_pic_path"]
+            image_path = serializer.validated_data["profile_pic_name"]
             get_profile_user.profile_pic_path = image_path
             get_profile_user.save()
 

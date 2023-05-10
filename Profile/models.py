@@ -78,7 +78,6 @@ class RecentEarnings(models.Model):
         return f"{self.user.first_name} earned {self.point_earned} through {self.way_to_earn}"
      
 
-
 class Referral(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     code = models.CharField(max_length=7, null=True, blank=True)
@@ -90,8 +89,6 @@ class Referral(models.Model):
         referred_by = Profile.objects.get(user_code=self.code).user.username
         return f"The user {referred_user} was referred by the user {referred_by} at {self.signed_up_at}"
 
-
-
 class ResetPassword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pin = models.CharField(max_length=4, null=False, blank=False, default=1)
@@ -100,10 +97,10 @@ class ResetPassword(models.Model):
     def __str__(self) -> str:
         return f"{self.user.username} requested pin that is {self.pin}"
 
-
 class SocialAccount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f"{self.user.username} created account using google"
+    
