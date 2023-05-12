@@ -43,6 +43,7 @@ class UserViewSet(viewsets.ModelViewSet):
         # Get email and device_id from request data
         email = request.data.get('email')
         device_id = request.data.get('device_id')
+        country = request.data.get('country')
 
         # If email is present, check if it belongs to an allowed provider
         if email:
@@ -87,6 +88,7 @@ class UserViewSet(viewsets.ModelViewSet):
             # Save device_id in Profile model
             profile = Profile.objects.get(user=user)
             profile.device_id = device_id
+            profile.country = country
             profile.save()
             
         except ValidationError:
@@ -366,6 +368,7 @@ class SocialAccountApi(viewsets.ModelViewSet):
             first_name = serializer.validated_data['first_name']
             email = serializer.validated_data['email']
             device_id = serializer.validated_data['device_id']
+            country = serializer.validated_data['country']
         else:
             return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -389,6 +392,7 @@ class SocialAccountApi(viewsets.ModelViewSet):
             # Save device_id in Profile model
             profile = Profile.objects.get(user=userObject)
             profile.device_id = device_id
+            profile.country = country
             profile.save()
 
             #Now Creating a social account

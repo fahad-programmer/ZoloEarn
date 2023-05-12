@@ -33,9 +33,10 @@ def generate_username(email):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     device_id = models.CharField(max_length=500, blank=True, null=True)
+    country = models.CharField(max_length=200, default="China", blank=True, null=True)
     number = models.CharField(max_length=11, blank=True, null=True)
     user_code = models.CharField(max_length=7, default=generate_unique_code, unique=True, blank=True, null=True)
-    profile_pic_path = models.CharField(max_length=1000, blank=True, null=True, default="https://i.ibb.co/MCCTf9R/profile-image-2.png")
+    profile_pic_path = models.CharField(max_length=1000, blank=True, null=True, default=1)
     total_earned = models.CharField(max_length=5000, blank=True, null=True, default="0")
 
     @receiver(post_save, sender=User)

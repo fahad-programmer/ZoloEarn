@@ -61,6 +61,7 @@ class SocialAccountSerializer(serializers.Serializer):
     email =  serializers.EmailField()
     first_name = serializers.CharField(max_length=50)
     device_id = serializers.CharField(max_length=500)
+    country = serializers.CharField(max_length=200)
     
 
 class UserStatsSerializer(serializers.ModelSerializer):
