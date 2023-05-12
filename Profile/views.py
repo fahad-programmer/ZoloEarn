@@ -467,3 +467,26 @@ class ProfileImageSelector(APIView):
         else:
             return Response({"message":"Some Error Occured Try Again Later"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class AvailablePaymentMethods(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args):
+        # gets the current user
+        current_user = request.user
+
+        #gets the current user country
+        current_user_country = Profile.objects.get(user=current_user)
+        
+        #Payment methods according to the country
+        if current_user_country.country == "Pakistan":
+            available_payment_methods = ["Easypaisa", "Jazzcash", "Sadapay"]
+            return Response({"methods": available_payment_methods}, status=status.HTTP_200_OK)
+        elif current_user_country.country == "India":
+            available_payment_methods = ["Paytm", "Paypal", "Bitcoin"]
+            return Response({"methods": available_payment_methods}, status=status.HTTP_200_OK)
+        else:
+            available_payment_methods = ["Paypal", "Bitcoin", "Google Pay"]
+            return Response({"methods": available_payment_methods}, status=status.HTTP_200_OK)
+        
+        return Response({"message":"Some Error Ocuured"}, status=status.HTTP_400_BAD_REQUEST)

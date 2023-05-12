@@ -30,5 +30,6 @@ urlpatterns = [
         'post': 'login'
     })),
     path('userStats', views.AllUserStats.as_view()),
-    path("profile-image-select", views.ProfileImageSelector.as_view())
+    path("profile-image-select", views.ProfileImageSelector.as_view()),
+    path("available-payment-methods", views.AvailablePaymentMethods.as_view(), name="available-payment")
    ]
