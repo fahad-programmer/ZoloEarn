@@ -24,7 +24,12 @@ class UserSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ('points', 'payment_method', 'created_at')
+        fields = ('points', 'payment_method', 'created_at', 'completed')
+
+class CreateTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = ('points', 'payment_method')
 
 class ReferralSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,3 +85,34 @@ class ProfileImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ["profile_pic_name"]
+
+class PaymentInfoSerializer(serializers.Serializer):
+    currencyInfo = serializers.CharField(max_length=100)
+    currencyRate = serializers.IntegerField()
+    
+class ProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['number', 'first_name', 'dob', 'country', 'username']
+
+    def get_first_name(self, obj):
+        return obj.user.first_name
+    
+    def get_username(self, obj):
+        return obj.user.username
+
+    def update(self, instance, validated_data):
+        # Update the fields of the Profile model
+        instance.number = validated_data.get('number', instance.number)
+        instance.dob = validated_data.get('dob', instance.dob)
+        instance.save()
+
+        # Update the related User model
+        user = instance.user
+        user.first_name = validated_data.get('first_name', user.first_name)
+        user.save()
+
+        return instance

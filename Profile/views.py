@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
+from .serializers import CreateTransactionSerializer, PaymentInfoSerializer, ProfileSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
 from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -490,3 +490,107 @@ class AvailablePaymentMethods(APIView):
             return Response({"methods": available_payment_methods}, status=status.HTTP_200_OK)
         
         return Response({"message":"Some Error Ocuured"}, status=status.HTTP_400_BAD_REQUEST)
+    
+class PaymentInfo(APIView):
+    authentication_classes = [TokenAuthentication]
+    serializer_class = PaymentInfoSerializer
+    
+
+    def get(self, request, *args):
+        # gets the current user
+        current_user = request.user
+
+        #gets the current user country
+        current_user_country = Profile.objects.get(user=current_user)
+        
+        #Getting user currecny info and rate
+        if current_user_country.country == "Pakistan":
+            currencyInfo = "USD - PKR"
+            currencyRate = 285
+        elif current_user_country.country == "India":
+            currencyInfo = "USD - INR"
+            currencyRate = 82
+        elif current_user_country.country == "Russia":
+            currencyInfo = "USD - RUB"
+            currencyRate = 80
+
+        serializer = PaymentInfoSerializer({"currencyInfo": currencyInfo, "currencyRate": currencyRate})
+        return Response(serializer.data)
+
+               
+
+
+class ProfileAPIView(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        profile = Profile.objects.get(user=user)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        profile = Profile.objects.get(user=user)
+
+        serializer = ProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class TransactionCreateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CreateTransactionSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            # Check if user has sufficient points
+            
+            #get the user wallet and check if he has points
+            userWallet = Wallet.objects.get(user=user)
+            userAmount = serializer.validated_data['points']
+
+            #Minimum Withdraw points
+            minimum_points = 8000
+
+            #get the user profile to check if the user is new
+            userProfile = Profile.objects.get(user=user)
+
+            if userProfile.new_user:
+                if userWallet.points >= userAmount:
+                    if userAmount >= 2000:
+                        userWallet.points -=  userAmount             
+                        #Set new user to false
+                        userProfile.new_user = False
+                        userProfile.save()
+                        #Deduct the points from wallet
+                        userWallet.save()           
+                        #Create the transaction object
+                        serializer.save(user=user)
+                        return Response({"message":"Withdrawal Successful"}, status=status.HTTP_200_OK)                    
+                else:
+                    return Response({"message":"Not Enough Points In Wallet"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+            else:
+                if userWallet.points >= userAmount:
+                    if userAmount >= minimum_points:
+                        #Deduct the points from wallet
+                        userWallet.points -=  userAmount
+                        userWallet.save()
+                        #Create the transaction object           
+                        serializer.save(user=user)
+                        return Response({"message":"Withdrawal Successful"}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({"message":"Points Less Than Minimum Withdraw"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({"message":"Not Enough Points In Wallet"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

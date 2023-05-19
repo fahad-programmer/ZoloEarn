@@ -33,7 +33,9 @@ def generate_username(email):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     device_id = models.CharField(max_length=500, blank=True, null=True)
-    country = models.CharField(max_length=200, default="China", blank=True, null=True)
+    new_user = models.BooleanField(default=True)
+    dob = models.CharField(max_length=50, default="01-05-2023")
+    country = models.CharField(max_length=200, default="United States", blank=True, null=True)
     number = models.CharField(max_length=11, blank=True, null=True)
     user_code = models.CharField(max_length=7, default=generate_unique_code, unique=True, blank=True, null=True)
     profile_pic_path = models.CharField(max_length=1000, blank=True, null=True, default=1)
@@ -63,6 +65,7 @@ class Wallet(models.Model):
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     points = models.IntegerField(default=0, null=True, blank=True)
+    completed = models.BooleanField(default=False)
     payment_method = models.CharField(max_length=100, default="Easypaisa")
     created_at = models.DateField(default=timezone.now().date())
 
