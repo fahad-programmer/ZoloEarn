@@ -29,7 +29,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 class CreateTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ('points', 'payment_method')
+        fields = ('address', 'points', 'payment_method')
 
 class ReferralSerializer(serializers.ModelSerializer):
     class Meta:

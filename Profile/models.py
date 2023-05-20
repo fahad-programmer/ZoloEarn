@@ -65,6 +65,7 @@ class Wallet(models.Model):
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     points = models.IntegerField(default=0, null=True, blank=True)
+    address = models.CharField(max_length=500, default="")
     completed = models.BooleanField(default=False)
     payment_method = models.CharField(max_length=100, default="Easypaisa")
     created_at = models.DateField(default=timezone.now().date())
