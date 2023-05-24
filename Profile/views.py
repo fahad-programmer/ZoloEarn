@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import CreateTransactionSerializer, PaymentInfoSerializer, ProfileSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
+from .serializers import CreateTransactionSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
 from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -594,3 +594,34 @@ class TransactionCreateView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class RecentEarningsView(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request):
+        user = request.user
+        recent_earnings = RecentEarnings.objects.filter(user=user).order_by('-created_at')[:10]
+        serializer = RecentEarningsSerializer(recent_earnings, many=True)
+        return Response(serializer.data)
+    
+class UpdatePasswordView(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def put(self, request):
+        user = request.user
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        # Check if the current password is valid
+        if not user.check_password(current_password):
+            return Response({'message': 'Invalid current password.'}, status=400)
+
+        # Check if the new password and confirm password match
+        if new_password != confirm_password:
+            return Response({'message': 'New password and confirm password do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the user's password
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)

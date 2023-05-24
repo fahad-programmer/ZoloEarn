@@ -66,6 +66,11 @@ urlpatterns = [
     path('profile', views.ProfileAPIView.as_view(), name='profile'),
 
     #Create a transaction
-    path('checkout', views.TransactionCreateView.as_view(), name="withdraw")
+    path('checkout', views.TransactionCreateView.as_view(), name="withdraw"),
 
+    #Get user recent earnings
+    path('recent-earnings', views.RecentEarningsView.as_view(), name='recent_earnings'),
+
+    #update the user password
+    path('update-password', views.UpdatePasswordView.as_view(), name='update_password'),
 ]

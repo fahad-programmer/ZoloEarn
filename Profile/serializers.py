@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Transaction, Referral, ResetPassword
+from .models import Transaction, Referral, ResetPassword, RecentEarnings
 from .models import generate_username, Profile
 
 User = get_user_model()
@@ -108,4 +108,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-
+class RecentEarningsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecentEarnings
+        fields = ('way_to_earn', 'point_earned', 'created_at')

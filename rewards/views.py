@@ -6,11 +6,12 @@ from Profile.models import Wallet
 from Profile.models import RecentEarnings
 from datetime import timedelta, timezone
 from datetime import timedelta
+from rest_framework import viewsets
 from django.utils import timezone
 from .models import SpinWheel, MonsterHunter, TickTacToe
 from django.utils import timezone as django_timezone
 from django.db.models import Sum
-from .serializers import UserStatsSerializer
+from .serializers import UserStatsSerializer, MonsterHunterSerializer
 from rest_framework import generics
 
 
@@ -245,4 +246,63 @@ class TTCLoseApi(APIView):
 
 
 
+class MonsterHunterTurn(APIView):
 
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        #Getting user turns
+        try:
+            userMonsterHunterObject = MonsterHunter.objects.get(user=user)
+            last_played_time = userMonsterHunterObject.last_played_at
+            current_time = django_timezone.now()
+            time_since_last_played = current_time - last_played_time
+            if time_since_last_played >= timedelta(hours=24):
+                userMonsterHunterObject.turn_available = 1
+                userMonsterHunterObject.save()
+            return Response({"message": str(userMonsterHunterObject.turn_available)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MonsterHunterApi(viewsets.ModelViewSet):
+
+    authentication_classes = [TokenAuthentication]
+    serializer_class = MonsterHunterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            points = serializer.validated_data['points']
+
+            #Add thoese points to wallet and deduct a turn
+            userWallet = Wallet.objects.get(user=request.user)
+            userWallet.points += int(points)
+            userWallet.save()
+
+            #Adding entry to recent earnings
+            user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Monster Hunter", point_earned=points)
+            user_recent_earning.save()
+
+            userMonsterHunterObj = MonsterHunter.objects.get(user=request.user)
+            userMonsterHunterObj.turn_available -= 1
+            userMonsterHunterObj.save()
+
+            return Response({"message":"Done"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message":"something happend"}, status=status.HTTP_400_BAD_REQUEST)
+        
+class AddMonsterHunterApi(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    
+    def post(self, request, *args):
+
+        #getting the user object of monster hunter
+        userMonsterHunterObj = MonsterHunter.objects.get(user=request.user)
+        userMonsterHunterObj.turn_available += 1
+        userMonsterHunterObj.save()
+
+        return Response({"message":"Done"}, status=status.HTTP_200_OK)

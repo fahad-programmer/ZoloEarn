@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import MonsterHunter
 
 User = get_user_model()
 
@@ -9,3 +10,6 @@ class UserStatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['first_name', 'wallet_points']  # Use a list instead of a string
+
+class MonsterHunterSerializer(serializers.Serializer):
+    points = serializers.IntegerField()

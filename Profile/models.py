@@ -77,7 +77,7 @@ class RecentEarnings(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     way_to_earn = models.CharField(max_length=300, blank=True, null=True)
     point_earned = models.IntegerField(blank=True, null=True, default=0)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateField(default=timezone.now().date())
 
     def __str__(self) -> str:
         return f"{self.user.first_name} earned {self.point_earned} through {self.way_to_earn}"

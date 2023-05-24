@@ -12,5 +12,7 @@ urlpatterns = [
     path("add-ttc-turn", views.addUserTTCTurn.as_view()),
     path('ttc-turn', views.TTCApiView.as_view()),
     path('ttc-user-lose', views.TTCLoseApi.as_view()),
-
+    path('monster-hunter-turns', views.MonsterHunterTurn.as_view()),
+    path('add-monster-hunter', views.AddMonsterHunterApi.as_view()),
+    path('monster-hunter', views.MonsterHunterApi.as_view({'post':'post'}))
 ]
