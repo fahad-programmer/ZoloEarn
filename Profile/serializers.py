@@ -91,28 +91,20 @@ class PaymentInfoSerializer(serializers.Serializer):
     currencyRate = serializers.IntegerField()
     
 class ProfileSerializer(serializers.ModelSerializer):
-    first_name = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField(read_only=True)
+    first_name = serializers.CharField(source='user.first_name', required=False)
+    username = serializers.CharField(source='user.username', required=False)
 
     class Meta:
         model = Profile
         fields = ['number', 'first_name', 'dob', 'country', 'username']
 
-    def get_first_name(self, obj):
-        return obj.user.first_name
-    
-    def get_username(self, obj):
-        return obj.user.username
-
     def update(self, instance, validated_data):
-        # Update the fields of the Profile model
-        instance.number = validated_data.get('number', instance.number)
-        instance.dob = validated_data.get('dob', instance.dob)
-        instance.save()
+        user_data = validated_data.pop('user', {})
+        instance.user.first_name = user_data.get('first_name', instance.user.first_name)
+        instance.user.username = user_data.get('username', instance.user.username)
+        instance.user.save()
 
-        # Update the related User model
-        user = instance.user
-        user.first_name = validated_data.get('first_name', user.first_name)
-        user.save()
+        return super().update(instance, validated_data)
 
-        return instance
+
+
