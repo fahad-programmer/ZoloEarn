@@ -93,10 +93,11 @@ class PaymentInfoSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
     username = serializers.CharField(source='user.username', required=False)
+    email = serializers.CharField(source='user.email', required=False)
 
     class Meta:
         model = Profile
-        fields = ['number', 'first_name', 'dob', 'country', 'username']
+        fields = ["email",'number', 'first_name', 'dob', 'country', 'username']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
