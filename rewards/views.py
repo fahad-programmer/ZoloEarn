@@ -85,7 +85,7 @@ class SpinWheelView(APIView):
 class DailyCheckIn(APIView):
     authentication_classes = [TokenAuthentication]
 
-    def post(self, request,  **kwargs):
+    def post(self, request, **kwargs):
         # Get the authenticated user from the request
         user = request.user
 
@@ -93,7 +93,7 @@ class DailyCheckIn(APIView):
         last_claimed = RecentEarnings.objects.filter(
             user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
 
-        if last_claimed and last_claimed.created_at > timezone.now() - timedelta(hours=24):
+        if last_claimed and last_claimed.created_at.date() > (timezone.now() - timedelta(hours=24)).date():
             # User has already claimed the award in the last 24 hours
             return Response({'message': 'You have already claimed the award in the last 24 hours.'}, status=400)
 
