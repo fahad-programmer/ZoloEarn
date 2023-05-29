@@ -379,7 +379,7 @@ class AddQuizInApi(APIView):
 
         return Response({"message":"Done"}, status=status.HTTP_200_OK)
     
- class QuizInTurns(APIView):
+class QuizInTurns(APIView):
 
     authentication_classes = [TokenAuthentication]
 
