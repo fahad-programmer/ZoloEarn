@@ -1,19 +1,17 @@
+from django.http import JsonResponse
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import get_user_model
-from Profile.models import Wallet
-from Profile.models import RecentEarnings
+from Profile.models import Wallet, RecentEarnings
 from datetime import timedelta, timezone
 from datetime import timedelta
 from rest_framework import viewsets
 from django.utils import timezone
 from .models import SpinWheel, MonsterHunter, TickTacToe
 from django.utils import timezone as django_timezone
-from django.db.models import Sum
-from .serializers import UserStatsSerializer, MonsterHunterSerializer
-from rest_framework import generics
-
+from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
+from .models import Subject, Quiz, Questions
 
 User = get_user_model()
 
@@ -93,7 +91,7 @@ class DailyCheckIn(APIView):
         last_claimed = RecentEarnings.objects.filter(
             user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
 
-        if last_claimed and last_claimed.created_at.date() > (timezone.now() - timedelta(hours=24)).date():
+        if last_claimed and last_claimed.created_at > (timezone.now() - timedelta(hours=24)).date():
             # User has already claimed the award in the last 24 hours
             return Response({'message': 'You have already claimed the award in the last 24 hours.'}, status=400)
 
@@ -287,7 +285,7 @@ class MonsterHunterApi(viewsets.ModelViewSet):
             user_recent_earning.save()
 
             userMonsterHunterObj = MonsterHunter.objects.get(user=request.user)
-            userMonsterHunterObj.turn_available -= 1
+            userMonsterHunterObj.turn_available = 0
             userMonsterHunterObj.save()
 
             return Response({"message":"Done"}, status=status.HTTP_200_OK)
@@ -304,5 +302,79 @@ class AddMonsterHunterApi(APIView):
         userMonsterHunterObj = MonsterHunter.objects.get(user=request.user)
         userMonsterHunterObj.turn_available += 1
         userMonsterHunterObj.save()
+
+        return Response({"message":"Done"}, status=status.HTTP_200_OK)
+
+
+class QuizInQuestions(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    serializer_class = QuizSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            subject = serializer.validated_data['subject']
+
+            # Getting the Subject object
+            subject_obj = Subject.objects.get(subject=subject)
+
+            # Getting the Questions
+            questions = Questions.objects.filter(subject=subject_obj)
+
+            # Serialize the questions
+            serializer = QuestionSerializer(questions, many=True)
+            serialized_questions = serializer.data
+
+            # Return the serialized questions as a JSON response
+        
+            return JsonResponse(serialized_questions, safe=False)
+
+        return JsonResponse(serializer.errors, status=400)
+            
+
+class QuizApi(viewsets.ModelViewSet):
+
+    authentication_classes = [TokenAuthentication]
+    serializer_class = QuizApiSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            points = serializer.validated_data['points']
+
+            # Add those points to the wallet and deduct a turn
+            userWallet = Wallet.objects.get(user=request.user)
+            userWallet.points += int(points)
+            userWallet.save()
+
+            # Adding entry to recent earnings
+            user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Quiz In", point_earned=points)
+            user_recent_earning.save()
+
+            # Get the Quiz object for the authenticated user (modify the filter criteria as needed)
+            userQuizInObj = Quiz.objects.get(user=request.user)
+
+            # Deduct a turn for the user
+            userQuizInObj.turn_available -= 1
+            userQuizInObj.save()
+
+            return Response({"message": "Done"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Something happened"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AddQuizInApi(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    
+    def post(self, request, *args):
+
+        # Get the Quiz object for the authenticated user (modify the filter criteria as needed)
+        userQuizInObj = Quiz.objects.get(user=request.user)
+
+        # Deduct a turn for the user
+        userQuizInObj.turn_available += 1
+        userQuizInObj.save()
 
         return Response({"message":"Done"}, status=status.HTTP_200_OK)

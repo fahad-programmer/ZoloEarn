@@ -14,5 +14,8 @@ urlpatterns = [
     path('ttc-user-lose', views.TTCLoseApi.as_view()),
     path('monster-hunter-turns', views.MonsterHunterTurn.as_view()),
     path('add-monster-hunter', views.AddMonsterHunterApi.as_view()),
-    path('monster-hunter', views.MonsterHunterApi.as_view({'post':'post'}))
+    path('monster-hunter', views.MonsterHunterApi.as_view({'post':'post'})),
+    path('quiz', views.QuizInQuestions.as_view({'post':'post'})),
+    path('quizApi', views.QuizApi.as_view({'post':'post'})),
+    path('addQuizApi', views.AddQuizInApi.as_view()),
 ]
