@@ -378,3 +378,23 @@ class AddQuizInApi(APIView):
         userQuizInObj.save()
 
         return Response({"message":"Done"}, status=status.HTTP_200_OK)
+    
+ class QuizInTurns(APIView):
+
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        #Getting user turns
+        try:
+            userQuizInObj = Quiz.objects.get(user=user)
+            last_played_time = userQuizInObj.last_played_at
+            current_time = django_timezone.now()
+            time_since_last_played = current_time - last_played_time
+            if time_since_last_played >= timedelta(hours=24):
+                userQuizInObj.turn_available = 1
+                userQuizInObj.save()
+            return Response({"message": str(userQuizInObj.turn_available)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
