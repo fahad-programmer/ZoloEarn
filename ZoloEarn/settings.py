@@ -102,10 +102,15 @@ SITE_ID = 1
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': os.environ.get("DATABASE_PASSWORD"),
+        'HOST': 'containers-us-west-64.railway.app',
+        'PORT': '7743',
     }
 }
+
 
 
 
