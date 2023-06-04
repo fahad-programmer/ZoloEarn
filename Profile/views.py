@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import CreateTransactionSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
@@ -212,21 +212,17 @@ class ResendVerificationEmail(APIView):
 
 
 class CheckUserActive(APIView):
-
-    #Checking for the user active condition
     def get(self, request, token, format=None):
         try:
-            token_obj = Token.objects.get(key=token)
+            token_obj = get_object_or_404(Token, key=token)
             user = token_obj.user
-            if user.is_active:
-                message = "User is active."
-            else:
-                message = "User is not active."
-            email = user.email
-            return Response({'message': message, 'email': email}, status=status.HTTP_200_OK)
         except Token.DoesNotExist:
-            message = "Invalid token."
-            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'No User Account'}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.is_active:
+            return Response({'message': 'User is active.', 'email': user.email}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'User is not active.'}, status=status.HTTP_200_OK)
         
 
 class UserCodeAPIView(APIView):
