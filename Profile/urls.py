@@ -51,7 +51,7 @@ urlpatterns = [
     })),
 
     # User Stats
-    path('userStats', views.AllUserStats.as_view()),
+    path('userStats', views.UserStatsAPIView.as_view()),
 
     # Profile Image Selector
     path("profile-image-select", views.ProfileImageSelector.as_view()),

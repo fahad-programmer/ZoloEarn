@@ -18,7 +18,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.db.models import Sum
-from django.db.models import F, Window
+from django.db.models import Sum, F, Window, Case, When
 from django.db.models.functions import Rank
 
 
@@ -359,8 +359,6 @@ class SocialAccountApi(viewsets.ModelViewSet):
         else:
             return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
         
-        
-
         userQuerySet = User.objects.filter(email=email)
 
         if userQuerySet.exists():
@@ -417,20 +415,13 @@ class SocialAccountApi(viewsets.ModelViewSet):
 
 
 
-class AllUserStats(generics.ListAPIView):
-    authentication_classes = [TokenAuthentication]
+class UserStatsAPIView(generics.ListAPIView):
     serializer_class = UserStatsSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        top_users = User.objects.annotate(
-            points=Sum('wallet__points'),
-            user_rank=Window(
-                expression=Rank(),
-                order_by=[F('wallet__points').desc(), 'id']
-            )
-        )[:50]
-
-        return top_users
+        return User.objects.order_by('-wallet__points')[:50]
 
      
 class ProfileImageSelector(APIView):
