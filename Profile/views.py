@@ -195,17 +195,8 @@ class ResendVerificationEmail(APIView):
             if user.is_active:
                 return Response({"message": "Your account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                # Check the last time an email was sent to this user
-                last_sent_time = last_email_sent.get(email, 0)
-                current_time = time.time()
-                if current_time - last_sent_time < 60:
-                    # Return an error message if an email was sent less than a minute ago
-                    return Response({"message": "Please wait at least one minute before requesting another verification email."}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    # Send the email and update the last sent time
-                    send_email(user)
-                    last_email_sent[email] = current_time
-                    return Response({"message": "Email has been sent successfully."}, status=status.HTTP_200_OK)
+                send_email(user=user)
+                return Response({"message": "Email has been sent successfully."}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": "User with this email does not exist."}, status=status.HTTP_400_BAD_REQUEST)
         

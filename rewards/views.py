@@ -329,7 +329,7 @@ class QuizInQuestions(viewsets.ModelViewSet):
         
             return JsonResponse(serialized_questions, safe=False)
 
-        return JsonResponse(serializer.errors, status=400)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
 
 class QuizApi(viewsets.ModelViewSet):
