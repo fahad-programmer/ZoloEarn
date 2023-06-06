@@ -72,11 +72,18 @@ class SocialAccountSerializer(serializers.Serializer):
 class UserStatsSerializer(serializers.ModelSerializer):
     wallet_points = serializers.IntegerField(source='wallet.points')
     profile_pic_path = serializers.CharField(source='profile.profile_pic_path')
-    rank = serializers.IntegerField(source='user_rank', read_only=True)
+    rank = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ['first_name', 'wallet_points', 'profile_pic_path', 'rank']
+
+    def get_rank(self, obj):
+        # Get the rank of the user based on their wallet points
+        users = User.objects.order_by('-wallet__points')
+        user_ids = [user.id for user in users]
+        rank = user_ids.index(obj.id) + 1
+        return rank
 
 
 class ProfileImageSerializer(serializers.ModelSerializer):
