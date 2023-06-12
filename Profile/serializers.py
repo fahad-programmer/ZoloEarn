@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Transaction, Referral, ResetPassword, RecentEarnings
+from .models import HelpCenter, Transaction, Referral, ResetPassword, RecentEarnings
 from .models import generate_username, Profile
 
 User = get_user_model()
@@ -80,9 +80,8 @@ class UserStatsSerializer(serializers.ModelSerializer):
 
     def get_rank(self, obj):
         # Get the rank of the user based on their wallet points
-        users = User.objects.order_by('-wallet__points')
-        user_ids = [user.id for user in users]
-        rank = user_ids.index(obj.id) + 1
+        top_users = User.objects.order_by('-wallet__points').values_list('id', flat=True)
+        rank = list(top_users).index(obj.id) + 1
         return rank
 
 
@@ -119,3 +118,18 @@ class RecentEarningsSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecentEarnings
         fields = ('way_to_earn', 'point_earned', 'created_at')
+
+
+class HelpCenterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelpCenter
+        fields = ('id', 'user', 'subject', 'message')
+
+    def validate_user(self, value):
+        user = value
+        help_center_count = HelpCenter.objects.filter(user=user).count()
+
+        if help_center_count >= 2:
+            raise serializers.ValidationError("A user can have only two HelpCenter objects.")
+
+        return value

@@ -50,7 +50,7 @@ class Profile(models.Model):
 
 class Wallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    points = models.IntegerField(default=0, null=True, blank=True)
+    points = models.IntegerField(default=0)
 
     @receiver(post_save, sender=User)
     def create_profile(sender, instance, created, **kwargs):
@@ -107,4 +107,10 @@ class SocialAccount(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} created account using google"
+    
+
+class HelpCenter(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=1000)
+    message = models.CharField(max_length=10000)
     

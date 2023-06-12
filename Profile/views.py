@@ -1,8 +1,8 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import CreateTransactionSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
-from .models import ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
+from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
+from .models import HelpCenter, ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -12,14 +12,10 @@ from rest_framework import viewsets
 from django_email_verification import send_email
 from rest_framework.views import APIView
 from rest_framework import generics
-import time
 from django.core.mail import EmailMessage
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.template.loader import render_to_string
-from django.db.models import Sum
-from django.db.models import Sum, F, Window, Case, When
-from django.db.models.functions import Rank
 
 
 
@@ -603,3 +599,11 @@ class UpdatePasswordView(APIView):
         user.save()
 
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+
+class HelpCenterViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    queryset = HelpCenter.objects.all()
+    serializer_class = HelpCenterSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

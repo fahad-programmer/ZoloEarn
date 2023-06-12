@@ -73,4 +73,6 @@ urlpatterns = [
 
     #update the user password
     path('update-password', views.UpdatePasswordView.as_view(), name='update_password'),
+
+    path('helpcenter', views.HelpCenterViewSet.as_view({'get': 'list', 'post': 'create'}), name='helpcenter-list'),
 ]
