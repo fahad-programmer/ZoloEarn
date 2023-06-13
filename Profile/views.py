@@ -614,7 +614,7 @@ class HelpCenterViewSet(viewsets.ModelViewSet):
         else:
             # If the user does not have an object, save the serializer with the user
             serializer.save(user=self.request.user)
-            return Response({"message": "You can only have one HelpCenter object"}, status=status.HTTP_409_CONFLICT)
+            return Response({"message": "Created Successfully"}, status=status.HTTP_200_OK)
             
         
         
