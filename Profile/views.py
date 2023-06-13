@@ -610,7 +610,11 @@ class HelpCenterViewSet(viewsets.ModelViewSet):
         existing_object = HelpCenter.objects.filter(user=self.request.user).first()
         if existing_object:
             # If the user already has an object, return a response indicating the conflict
-            return Response({"detail": "You can only have one HelpCenter object"}, status=status.HTTP_409_CONFLICT)
+            return Response({"message": "You can only have one HelpCenter object"}, status=status.HTTP_409_CONFLICT)
+        else:
+            # If the user does not have an object, save the serializer with the user
+            serializer.save(user=self.request.user)
+            return Response({"message": "You can only have one HelpCenter object"}, status=status.HTTP_409_CONFLICT)
+            
         
-        # If the user does not have an object, save the serializer with the user
-        serializer.save(user=self.request.user)
+        
