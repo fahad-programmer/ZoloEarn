@@ -123,7 +123,7 @@ class RecentEarningsSerializer(serializers.ModelSerializer):
 class HelpCenterSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpCenter
-        fields = ('id', 'user', 'subject', 'message')
+        fields = ('subject', 'message')
 
     def validate_user(self, value):
         user = value
