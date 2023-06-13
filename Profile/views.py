@@ -605,16 +605,16 @@ class HelpCenterViewSet(viewsets.ModelViewSet):
     queryset = HelpCenter.objects.all()
     serializer_class = HelpCenterSerializer
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         # Check if the user already has a HelpCenter object
-        existing_object = HelpCenter.objects.filter(user=self.request.user).first()
+        existing_object = HelpCenter.objects.filter(user=request.user).first()
         if existing_object:
-            # If the user already has an object, return a response indicating the conflict
-            return Response({"message": "You can only have one HelpCenter object"}, status=status.HTTP_409_CONFLICT)
+            # If the user already has an object, return the serialized data of the existing object
+            serializer = self.get_serializer(existing_object)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            # If the user does not have an object, save the serializer with the user
-            serializer.save(user=self.request.user)
-            return Response({"message": "Created Successfully"}, status=status.HTTP_200_OK)
+            # If the user does not have an object, proceed with the creation
+            return super().create(request, *args, **kwargs)
             
         
         
