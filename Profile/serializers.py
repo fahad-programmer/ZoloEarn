@@ -124,12 +124,3 @@ class HelpCenterSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpCenter
         fields = ('id', 'user', 'subject', 'message')
-
-    def validate_user(self, value):
-        user = value
-        help_center_count = HelpCenter.objects.filter(user=user).count()
-
-        if help_center_count >= 2:
-            raise serializers.ValidationError("A user can have only two HelpCenter objects.")
-
-        return value

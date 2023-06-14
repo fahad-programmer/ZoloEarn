@@ -126,7 +126,6 @@ class TransactionListView(generics.ListAPIView):
 
 class ReferralView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
     queryset = Referral.objects.all()
     serializer_class = ReferralSerializer
 
@@ -233,7 +232,6 @@ class ReferralList(APIView):
 
     #Getting the list of Refferal For the User
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         referrals = Referral.objects.filter(code=request.user.profile.user_code)
