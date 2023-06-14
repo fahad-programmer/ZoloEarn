@@ -598,21 +598,24 @@ class UpdatePasswordView(APIView):
 
         return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
 
-class HelpCenterViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    queryset = HelpCenter.objects.all()
-    serializer_class = HelpCenterSerializer
+class HelpCenterAPIView(APIView):
 
-    def create(self, request, *args, **kwargs):
-        # Check if the user already has a HelpCenter object
-        existing_object = HelpCenter.objects.filter(user=request.user).first()
-        if existing_object:
-            # If the user already has an object, return the serialized data of the existing object
-            serializer = self.get_serializer(existing_object)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # If the user does not have an object, proceed with the creation
-            return super().create(request, *args, **kwargs)
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        user = request.user
+        # Check if the user already has an instance of HelpCenter
+        if HelpCenter.objects.filter(user=user).exists():
+            return Response({"error": "You can only have one instance of HelpCenter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a new HelpCenter instance
+        serializer = HelpCenterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
             
         
         
