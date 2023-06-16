@@ -612,7 +612,7 @@ class HelpCenterAPIView(APIView):
         serializer = HelpCenterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=user)
-            return Response({"message":"Submitted Successfully", status=status.HTTP_201_CREATED)
+            return Response({"message":"Submitted Successfully"}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
