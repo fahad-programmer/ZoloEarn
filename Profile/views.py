@@ -606,7 +606,7 @@ class HelpCenterAPIView(APIView):
         user = request.user
         # Check if the user already has an instance of HelpCenter
         if HelpCenter.objects.filter(user=user).exists():
-            return Response({"error": "You can only have one instance of HelpCenter."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "You can only have one instance of HelpCenter."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create a new HelpCenter instance
         serializer = HelpCenterSerializer(data=request.data)
