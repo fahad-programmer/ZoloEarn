@@ -1,4 +1,5 @@
-from django.http import JsonResponse
+import json
+from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
@@ -136,7 +137,7 @@ class UserSpinTurn(APIView):
             last_spin_time = userWheelObject.last_played_at
             current_time = django_timezone.now()
             time_since_last_spin = current_time - last_spin_time
-            if time_since_last_spin >= timedelta(hours=24):
+            if time_since_last_spin >= timedelta(hours=6):
                 userWheelObject.spin_available = 1
                 userWheelObject.save()
         except SpinWheel.DoesNotExist:
@@ -180,7 +181,7 @@ class userTTCAvailabeTurn(APIView):
             last_played_time = userTTCObject.last_played_at
             current_time = django_timezone.now()
             time_since_last_played = current_time - last_played_time
-            if time_since_last_played >= timedelta(hours=24):
+            if time_since_last_played >= timedelta(hours=6):
                 userTTCObject.turn_available = 1
                 userTTCObject.save()
             return Response({"message": str(userTTCObject.turn_available)}, status=status.HTTP_200_OK)
@@ -257,7 +258,7 @@ class MonsterHunterTurn(APIView):
             last_played_time = userMonsterHunterObject.last_played_at
             current_time = django_timezone.now()
             time_since_last_played = current_time - last_played_time
-            if time_since_last_played >= timedelta(hours=24):
+            if time_since_last_played >= timedelta(hours=6):
                 userMonsterHunterObject.turn_available = 1
                 userMonsterHunterObject.save()
             return Response({"message": str(userMonsterHunterObject.turn_available)}, status=status.HTTP_200_OK)
@@ -392,9 +393,39 @@ class QuizInTurns(APIView):
             last_played_time = userQuizInObj.last_played_at
             current_time = django_timezone.now()
             time_since_last_played = current_time - last_played_time
-            if time_since_last_played >= timedelta(hours=24):
+            if time_since_last_played >= timedelta(hours=6):
                 userQuizInObj.turn_available = 1
                 userQuizInObj.save()
             return Response({"message": str(userQuizInObj.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+#Function realted to automating the quiz section
+def load_questions_from_json_view(request):
+
+    json_file = 'questions.json'  # Specify the path to your JSON file
+        
+    with open(json_file, 'r') as file:
+        data = json.load(file)
+            
+    for item in data:
+        subject_name = item['subject']
+        subject, _ = Subject.objects.get_or_create(subject=subject_name)
+            
+        question = Questions.objects.create(
+                subject=subject,
+                question=item['question'],
+                choice1=item['choices'][0],
+                choice2=item['choices'][1],
+                choice3=item['choices'][2],
+                choice4=item['choices'][3],
+                answer=item['correct_answer']
+            )
+        print("Done")
+
+    return HttpResponse("All Questions Added")
+            
+
+    
