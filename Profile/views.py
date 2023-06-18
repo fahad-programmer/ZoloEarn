@@ -478,13 +478,16 @@ class PaymentInfo(APIView):
         #Getting user currecny info and rate
         if current_user_country.country == "Pakistan":
             currencyInfo = "USD - PKR"
-            currencyRate = 285
+            currencyRate = 286
         elif current_user_country.country == "India":
             currencyInfo = "USD - INR"
-            currencyRate = 82
+            currencyRate = 81
         elif current_user_country.country == "Russia":
             currencyInfo = "USD - RUB"
-            currencyRate = 80
+            currencyRate = 83
+        else:
+            currencyInfo = "USD - USD"
+            currencyRate = 1
 
         serializer = PaymentInfoSerializer({"currencyInfo": currencyInfo, "currencyRate": currencyRate})
         return Response(serializer.data)
