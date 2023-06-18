@@ -259,7 +259,7 @@ class MonsterHunterTurn(APIView):
             current_time = django_timezone.now()
             time_since_last_played = current_time - last_played_time
             if time_since_last_played >= timedelta(hours=6):
-                userMonsterHunterObject.turn_available = 1
+                userMonsterHunterObject.turn_available = 2
                 userMonsterHunterObject.save()
             return Response({"message": str(userMonsterHunterObject.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:

@@ -20,7 +20,7 @@ class SpinWheel(models.Model):
 
 class MonsterHunter(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    turn_available = models.IntegerField(default=1)
+    turn_available = models.IntegerField(default=2)
     last_played_at = models.DateTimeField(auto_now=True)
 
     @receiver(post_save, sender=User)
@@ -35,7 +35,7 @@ class MonsterHunter(models.Model):
 
 class TickTacToe(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    turn_available = models.IntegerField(default=1)
+    turn_available = models.IntegerField(default=10)
     last_played_at = models.DateTimeField(auto_now=True)
 
     @receiver(post_save, sender=User)
