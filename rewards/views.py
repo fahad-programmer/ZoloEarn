@@ -182,7 +182,7 @@ class userTTCAvailabeTurn(APIView):
             current_time = django_timezone.now()
             time_since_last_played = current_time - last_played_time
             if time_since_last_played >= timedelta(hours=6):
-                userTTCObject.turn_available = 1
+                userTTCObject.turn_available = 10
                 userTTCObject.save()
             return Response({"message": str(userTTCObject.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -223,7 +223,7 @@ class TTCApiView(APIView):
 
         #Now adding points to the user wallet ()
         userWallet = Wallet.objects.get(user=user)
-        userWallet.points += 50
+        userWallet.points += 5
         userWallet.save()
 
         return Response({"message" : "Points Added To The Wallet"}, status=status.HTTP_200_OK)

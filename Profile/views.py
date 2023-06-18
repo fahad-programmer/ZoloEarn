@@ -159,7 +159,7 @@ class ReferralView(APIView):
             # Add points to the referrer's wallet and create a new referral
             referrer_wallet = Wallet.objects.get(user=current_user)
             Referral.objects.create(user=Profile.objects.get(user=current_user), code=code)
-            referrer_wallet.points += 50
+            referrer_wallet.points += 100
             referrer_wallet.save()
 
             #Writing the earning history from database
@@ -169,7 +169,7 @@ class ReferralView(APIView):
 
             # Add points to the referred user's wallet
             referred_user_wallet = Wallet.objects.get(user=referred_user)
-            referred_user_wallet.points += 100
+            referred_user_wallet.points += 50
             referred_user_wallet.save()
 
             #Writing the earning history from database
