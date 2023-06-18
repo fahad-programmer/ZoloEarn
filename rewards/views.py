@@ -312,6 +312,15 @@ class QuizInQuestions(viewsets.ModelViewSet):
     serializer_class = QuizSerializer
 
     def post(self, request, *args, **kwargs):
+
+        #Deducting
+        # Get the Quiz object for the authenticated user (modify the filter criteria as needed)
+        userQuizInObj = Quiz.objects.get(user=request.user)
+
+        # Deduct a turn for the user
+        userQuizInObj.turn_available -= 1
+        userQuizInObj.save()
+        
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             subject = serializer.validated_data['subject']
@@ -352,13 +361,6 @@ class QuizApi(viewsets.ModelViewSet):
             # Adding entry to recent earnings
             user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Quiz In", point_earned=points)
             user_recent_earning.save()
-
-            # Get the Quiz object for the authenticated user (modify the filter criteria as needed)
-            userQuizInObj = Quiz.objects.get(user=request.user)
-
-            # Deduct a turn for the user
-            userQuizInObj.turn_available -= 1
-            userQuizInObj.save()
 
             return Response({"message": "Done"}, status=status.HTTP_200_OK)
         else:
