@@ -74,5 +74,10 @@ urlpatterns = [
     #update the user password
     path('update-password', views.UpdatePasswordView.as_view(), name='update_password'),
 
+    #help center Api
     path('helpcenter', views.HelpCenterAPIView.as_view(), name='helpcenter-list'),
+
+    #Version Control api
+    path("version", views.VersionCheck.as_view(), name="versionCheck")
+
 ]

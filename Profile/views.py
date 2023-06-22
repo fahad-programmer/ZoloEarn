@@ -518,7 +518,6 @@ class ProfileAPIView(APIView):
     
 class TransactionCreateView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = CreateTransactionSerializer(data=request.data)
@@ -619,6 +618,10 @@ class HelpCenterAPIView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            
-        
-        
+
+class VersionCheck(APIView):
+    def get(self, request, *args, **kwargs):
+        latest_version = "2.1"
+        return Response({"message": latest_version})
+    
+

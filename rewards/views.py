@@ -137,7 +137,7 @@ class UserSpinTurn(APIView):
             last_spin_time = userWheelObject.last_played_at
             current_time = django_timezone.now()
             time_since_last_spin = current_time - last_spin_time
-            if time_since_last_spin >= timedelta(hours=6):
+            if time_since_last_spin >= timedelta(hours=24):
                 userWheelObject.spin_available = 1
                 userWheelObject.save()
         except SpinWheel.DoesNotExist:
@@ -258,7 +258,7 @@ class MonsterHunterTurn(APIView):
             last_played_time = userMonsterHunterObject.last_played_at
             current_time = django_timezone.now()
             time_since_last_played = current_time - last_played_time
-            if time_since_last_played >= timedelta(hours=6):
+            if time_since_last_played >= timedelta(hours=12):
                 userMonsterHunterObject.turn_available = 2
                 userMonsterHunterObject.save()
             return Response({"message": str(userMonsterHunterObject.turn_available)}, status=status.HTTP_200_OK)
