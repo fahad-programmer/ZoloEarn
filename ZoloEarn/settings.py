@@ -202,7 +202,7 @@ def verified_callback(user):
 
 
 EMAIL_VERIFIED_CALLBACK = verified_callback
-EMAIL_FROM_ADDRESS = 'unexpectedprogrammer@gmail.com'
+EMAIL_FROM_ADDRESS = 'zoloearn.llc@gmail.com'
 EMAIL_MAIL_SUBJECT = 'Confirm your email {{ user.username }}'
 EMAIL_MAIL_HTML = 'mail/mail.html'
 EMAIL_MAIL_PLAIN = 'mail/mail.txt'
