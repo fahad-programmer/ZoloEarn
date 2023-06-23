@@ -621,7 +621,7 @@ class HelpCenterAPIView(APIView):
 
 class VersionCheck(APIView):
     def get(self, request, *args, **kwargs):
-        latest_version = "3.1"
+        latest_version = "2.1"
         return Response({"message": latest_version})
     
 
