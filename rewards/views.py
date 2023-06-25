@@ -218,7 +218,7 @@ class TTCApiView(APIView):
         userTTCObject.save()
 
         #Adding entry to recent earnings
-        user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Tic Tac Toe", point_earned=50)
+        user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Tic Tac Toe", point_earned=5)
         user_recent_earning.save()
 
         #Now adding points to the user wallet ()

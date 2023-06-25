@@ -2,12 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.core.validators import MaxValueValidator, MinValueValidator 
 
 # Create your models here.
 
 class SpinWheel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    spin_available = models.IntegerField(default=2)
+    spin_available = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), MaxValueValidator(5)])
     last_played_at = models.DateTimeField(auto_now=True)
 
     @receiver(post_save, sender=User)
@@ -20,7 +21,7 @@ class SpinWheel(models.Model):
 
 class MonsterHunter(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    turn_available = models.IntegerField(default=2)
+    turn_available = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), MaxValueValidator(5)])
     last_played_at = models.DateTimeField(auto_now=True)
 
     @receiver(post_save, sender=User)
@@ -35,7 +36,7 @@ class MonsterHunter(models.Model):
 
 class TickTacToe(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    turn_available = models.IntegerField(default=10)
+    turn_available = models.PositiveIntegerField(default=10, validators=[MinValueValidator(0), MaxValueValidator(20)])
     last_played_at = models.DateTimeField(auto_now=True)
 
     @receiver(post_save, sender=User)
@@ -49,7 +50,7 @@ class TickTacToe(models.Model):
 
 class Quiz(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    turn_available = models.IntegerField(default=1)
+    turn_available = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), MaxValueValidator(5)])
     last_played_at = models.DateTimeField(auto_now=True)
 
     @receiver(post_save, sender=User)
