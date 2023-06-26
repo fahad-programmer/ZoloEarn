@@ -92,9 +92,9 @@ class DailyCheckIn(APIView):
         last_claimed = RecentEarnings.objects.filter(
             user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
 
-        if last_claimed and last_claimed.created_at > (timezone.now() - timedelta(hours=24)).date():
-            # User has already claimed the award in the last 24 hours
-            return Response({'message': 'You have already claimed the award in the last 24 hours.'}, status=400)
+        if last_claimed and last_claimed.created_at >= timezone.now().date():
+            # User has already claimed the award today
+            return Response({'message': 'You have already claimed the award today.'}, status=400)
 
         # Add the points to the user's account
         user_wallet = Wallet.objects.get(user=user)
