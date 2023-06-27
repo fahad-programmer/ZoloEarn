@@ -308,6 +308,9 @@ class AddMonsterHunterApi(APIView):
 
 
 class QuizInQuestions(viewsets.ModelViewSet):
+
+
+
     authentication_classes = [TokenAuthentication]
     serializer_class = QuizSerializer
 
@@ -318,9 +321,13 @@ class QuizInQuestions(viewsets.ModelViewSet):
         userQuizInObj = Quiz.objects.get(user=request.user)
 
         # Deduct a turn for the user
-        userQuizInObj.turn_available -= 1
-        userQuizInObj.save()
-        
+
+        if userQuizInObj.turn_available == 0:
+            return JsonResponse({"message":"You Have 0 Turns Available"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            userQuizInObj.turn_available -= 1
+            userQuizInObj.save()
+
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             subject = serializer.validated_data['subject']
@@ -329,7 +336,7 @@ class QuizInQuestions(viewsets.ModelViewSet):
             subject_obj = Subject.objects.get(subject=subject)
 
             # Getting the Questions
-            questions = Questions.objects.filter(subject=subject_obj)
+            questions = Questions.objects.filter(subject=subject_obj).order_by('?')[:10]
 
             # Serialize the questions
             serializer = QuestionSerializer(questions, many=True)

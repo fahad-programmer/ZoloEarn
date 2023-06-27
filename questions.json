@@ -1,112 +1,123 @@
 [
     {
-        "subject": "Chemistry",
-        "question": "What is the chemical symbol for gold?",
-        "choices": [
-            "Go",
-            "Au",
-            "Ag",
-            "Gl"
-        ],
-        "correct_answer": "Au"
+      "subject": "Sports",
+      "question": "Which country won the FIFA World Cup in 2018?",
+      "choices": ["Germany", "Brazil", "France", "Argentina"],
+      "correct_answer": "France"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the pH value of a neutral substance?",
-        "choices": [
-            "1",
-            "7",
-            "14",
-            "0"
-        ],
-        "correct_answer": "7"
+      "subject": "Sports",
+      "question": "In which sport is the term 'birdie' used?",
+      "choices": ["Tennis", "Golf", "Cricket", "Basketball"],
+      "correct_answer": "Golf"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the lightest element on the periodic table?",
-        "choices": [
-            "Oxygen",
-            "Carbon",
-            "Hydrogen",
-            "Helium"
-        ],
-        "correct_answer": "Hydrogen"
+      "subject": "Sports",
+      "question": "Who holds the record for the most home runs in Major League Baseball?",
+      "choices": ["Babe Ruth", "Hank Aaron", "Barry Bonds", "Alex Rodriguez"],
+      "correct_answer": "Barry Bonds"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the chemical formula for water?",
-        "choices": [
-            "H2O2",
-            "CO2",
-            "H2SO4",
-            "H2O"
-        ],
-        "correct_answer": "H2O"
+      "subject": "Sports",
+      "question": "Which tennis player has won the most Grand Slam titles in singles?",
+      "choices": ["Roger Federer", "Rafael Nadal", "Novak Djokovic", "Serena Williams"],
+      "correct_answer": "Roger Federer"
     },
     {
-        "subject": "Chemistry",
-        "question": "Which gas is most abundant in Earth's atmosphere?",
-        "choices": [
-            "Oxygen",
-            "Carbon dioxide",
-            "Nitrogen",
-            "Hydrogen"
-        ],
-        "correct_answer": "Nitrogen"
+      "subject": "Sports",
+      "question": "Which country has won the most Olympic gold medals in the history of the Summer Olympics?",
+      "choices": ["United States", "China", "Soviet Union", "Germany"],
+      "correct_answer": "United States"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the process of converting a solid directly into a gas called?",
-        "choices": [
-            "Condensation",
-            "Sublimation",
-            "Evaporation",
-            "Melting"
-        ],
-        "correct_answer": "Sublimation"
+      "subject": "Sports",
+      "question": "In which city are the headquarters of the International Olympic Committee (IOC) located?",
+      "choices": ["Paris", "Lausanne", "Geneva", "London"],
+      "correct_answer": "Lausanne"
     },
     {
-        "subject": "Chemistry",
-        "question": "Which element is essential for human respiration?",
-        "choices": [
-            "Carbon",
-            "Oxygen",
-            "Nitrogen",
-            "Hydrogen"
-        ],
-        "correct_answer": "Oxygen"
+      "subject": "Sports",
+      "question": "Which country has won the most FIFA World Cup titles?",
+      "choices": ["Brazil", "Germany", "Italy", "Argentina"],
+      "correct_answer": "Brazil"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the chemical symbol for iron?",
-        "choices": [
-            "Ir",
-            "Fe",
-            "Au",
-            "Ag"
-        ],
-        "correct_answer": "Fe"
+      "subject": "Sports",
+      "question": "Who is the all-time leading scorer in NBA history?",
+      "choices": ["LeBron James", "Kareem Abdul-Jabbar", "Michael Jordan", "Kobe Bryant"],
+      "correct_answer": "Kareem Abdul-Jabbar"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the state of matter with the least amount of energy?",
-        "choices": [
-            "Solid",
-            "Liquid",
-            "Gas",
-            "Plasma"
-        ],
-        "correct_answer": "Gas"
+      "subject": "Sports",
+      "question": "Which sport uses a shuttlecock?",
+      "choices": ["Badminton", "Table tennis", "Volleyball", "Squash"],
+      "correct_answer": "Badminton"
     },
     {
-        "subject": "Chemistry",
-        "question": "What is the process of combining two or more elements to form a new substance called?",
-        "choices": [
-            "Decomposition",
-            "Combustion",
-            "Ionization",
-            "Chemical reaction"
-        ],
-        "correct_answer": "Chemical reaction"
+      "subject": "Sports",
+      "question": "Which athlete has the most Olympic gold medals of all time?",
+      "choices": ["Usain Bolt", "Michael Phelps", "Carl Lewis", "Jesse Owens"],
+      "correct_answer": "Michael Phelps"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which team has won the most Super Bowl titles in NFL history?",
+      "choices": ["New England Patriots", "Pittsburgh Steelers", "San Francisco 49ers", "Dallas Cowboys"],
+      "correct_answer": "New England Patriots"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which country has won the most UEFA European Championship titles?",
+      "choices": ["Germany", "Spain", "France", "Italy"],
+      "correct_answer": "Germany"
+    },
+    {
+      "subject": "Sports",
+      "question": "Who is the most decorated Olympian of all time?",
+      "choices": ["Usain Bolt", "Michael Phelps", "Carl Lewis", "Jesse Owens"],
+      "correct_answer": "Michael Phelps"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which team has won the most NBA championships?",
+      "choices": ["Los Angeles Lakers", "Boston Celtics", "Chicago Bulls", "Golden State Warriors"],
+      "correct_answer": "Boston Celtics"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which country has won the most Rugby World Cup titles?",
+      "choices": ["New Zealand", "Australia", "England", "South Africa"],
+      "correct_answer": "New Zealand"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which athlete holds the record for the fastest 100-meter sprint in history?",
+      "choices": ["Usain Bolt", "Carl Lewis", "Tyson Gay", "Justin Gatlin"],
+      "correct_answer": "Usain Bolt"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which team has won the most UEFA Champions League titles?",
+      "choices": ["Real Madrid", "Barcelona", "Bayern Munich", "Liverpool"],
+      "correct_answer": "Real Madrid"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which sport is known as the 'gentleman's game'?",
+      "choices": ["Golf", "Cricket", "Tennis", "Polo"],
+      "correct_answer": "Cricket"
+    },
+    {
+      "subject": "Sports",
+      "question": "Who is the all-time leading goal scorer in international soccer?",
+      "choices": ["Lionel Messi", "Cristiano Ronaldo", "Pelé", "Miroslav Klose"],
+      "correct_answer": "Ali Daei"
+    },
+    {
+      "subject": "Sports",
+      "question": "Which country has won the most Olympic gold medals in the history of the Winter Olympics?",
+      "choices": ["United States", "Norway", "Soviet Union", "Germany"],
+      "correct_answer": "Norway"
     }
-]
+  ]
+  

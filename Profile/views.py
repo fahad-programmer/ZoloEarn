@@ -573,7 +573,7 @@ class RecentEarningsView(APIView):
 
     def get(self, request):
         user = request.user
-        recent_earnings = RecentEarnings.objects.filter(user=user).order_by('-created_at')[:10]
+        recent_earnings = RecentEarnings.objects.filter(user=user).order_by('-created_at')[:10][::-1]
         serializer = RecentEarningsSerializer(recent_earnings, many=True)
         return Response(serializer.data)
     
