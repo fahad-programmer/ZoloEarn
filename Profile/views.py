@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
-from .models import HelpCenter, ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount
+from .models import HelpCenter, ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount, VerifyUser
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -79,7 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user = User.objects.get(pk=serializer.data['id'])
             user.is_active = False
             user.save()
-            send_email(user)
+            SendVerificationEmail(user.get_username(), user.email)
 
             # Save device_id in Profile model
             profile = Profile.objects.get(user=user)
@@ -163,7 +163,7 @@ class ReferralView(APIView):
             referrer_wallet.save()
 
             #Writing the earning history from database
-            referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points", point_earned=50)
+            referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points", point_earned=100)
             referrer_earning.save()
 
 
@@ -237,6 +237,43 @@ class ReferralList(APIView):
         referrals = Referral.objects.filter(code=request.user.profile.user_code)
         serializer = GetReferralSerializer(referrals, many=True)
         return Response(serializer.data)
+    
+
+def SendVerificationEmail(username, email):
+    #Deleting all the objects that are old than 15 mins
+    VerifyUser.objects.filter(created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
+
+    # Check if there is an existing ResetPassword object for the user
+    verify_user = VerifyUser.objects.filter(user=User.objects.get(username=username)).first()
+
+    # If there is an existing ResetPassword object and it was created less than 15 minutes ago, return an error
+    if verify_user and timezone.now() < verify_user.created_at + timezone.timedelta(minutes=15):
+        time_diff = (verify_user.created_at + timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
+        return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    # Generate a new PIN and create a new ResetPassword object for the user
+    pin = get_random_string(length=4, allowed_chars='1234567890')
+    verify_user_object = VerifyUser.objects.create(user=User.objects.get(username=username), pin=pin)
+    verify_user_object.save()
+
+    #Sending the Email
+
+    context = {"username" : User.objects.get(email=email).username, "pin": pin}
+    email_body = render_to_string('mail/forget_email.html', context)
+
+    email = EmailMessage(
+        'Password Reset for Zolo Earn App',
+        email_body,
+        'zoloearn.llc@gmail.com',
+        to=[email]
+        )
+
+    email.content_subtype = 'html'
+    email.send()
+
+
+
 
 
 class ForgotPasswordView(APIView):
@@ -537,7 +574,7 @@ class TransactionCreateView(APIView):
 
             if userProfile.new_user:
                 if userWallet.points >= userAmount:
-                    if userAmount >= 2000:
+                    if userAmount >= 5000:
                         userWallet.points -=  userAmount             
                         #Set new user to false
                         userProfile.new_user = False
@@ -561,7 +598,7 @@ class TransactionCreateView(APIView):
                         serializer.save(user=user)
                         return Response({"message":"Withdrawal Successful"}, status=status.HTTP_200_OK)
                     else:
-                        return Response({"message":"Points Less Than Minimum Withdraw"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"message":"Points Less Than Minimum Withdraw (Changes Made Recently)"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"message":"Not Enough Points In Wallet"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -621,7 +658,7 @@ class HelpCenterAPIView(APIView):
 
 class VersionCheck(APIView):
     def get(self, request, *args, **kwargs):
-        latest_version = "2.1"
+        latest_version = "2.2"
         return Response({"message": latest_version})
     
 

@@ -13,7 +13,12 @@ admin.site.register(Transaction, TransactionAdmin)
 
 
 admin.site.register(Referral)
-admin.site.register(RecentEarnings)
+
+class RecentEarningsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'way_to_earn', 'point_earned', 'created_at']
+    list_filter = ['user']
+
+admin.site.register(RecentEarnings, RecentEarningsAdmin)
 admin.site.register(ResetPassword)
 admin.site.register(SocialAccount)
 admin.site.register(HelpCenter)

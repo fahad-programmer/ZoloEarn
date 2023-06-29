@@ -238,10 +238,18 @@ class TTCLoseApi(APIView):
 
         #TTC Object
         userTTCObject = TickTacToe.objects.get(user=user)
-        userTTCObject.turn_available -= 1
-        userTTCObject.save()
 
-        return Response({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
+        if userTTCObject.turn_available == 0:
+            return Response({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            userTTCObject.turn_available -= 1
+            userTTCObject.save()
+            return Response({"message":"User Lost A Game"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        
+
+        
 
 
 
