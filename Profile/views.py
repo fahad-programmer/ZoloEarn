@@ -136,7 +136,7 @@ def SendVerificationEmail(username, email):
     # Sending the Email
 
     context = {"username": User.objects.get(email=email).username, "pin": pin}
-    email_body = render_to_string('mail/verifyUser.html', context)
+    email_body = render_to_string('mail/verifyUser.Html', context)
 
     email = EmailMessage(
         'Complete Your Signup On ZoloEarn',
