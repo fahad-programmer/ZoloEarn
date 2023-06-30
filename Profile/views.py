@@ -162,6 +162,8 @@ class CheckVerificationPin(APIView):
             try:
                 verify_pin_obj = VerifyUser.objects.get(user=user)
                 if verify_pin_obj.pin == pin and timezone.now() <= verify_pin_obj.created_at + timezone.timedelta(minutes=5):
+                    user.is_active = True
+                    user.save()
                     return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
                 else:
                     return Response({'message': 'Invalid or expired PIN'}, status=status.HTTP_400_BAD_REQUEST)
