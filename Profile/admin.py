@@ -3,7 +3,12 @@ from .models import HelpCenter, Profile, Wallet, Transaction, Referral, RecentEa
 
 # Register your models here.
 admin.site.register(Profile)
-admin.site.register(Wallet)
+
+class WalletAdmin(admin.ModelAdmin):
+    list_display = ('user', 'points')
+    search_fields = ('user__username', 'points')
+
+admin.site.register(Wallet, WalletAdmin)
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ['user', 'points', 'payment_method', 'completed']

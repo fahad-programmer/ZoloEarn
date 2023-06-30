@@ -19,9 +19,6 @@ urlpatterns = [
     # Referral
     path('referral', views.ReferralView.as_view()),
 
-    # Resend Verification Email
-    path('resend-verification-email', views.ResendVerificationEmail.as_view(), name='resend-verification-email'),
-
     # Check User Active
     path('check-user-active/<str:token>', views.CheckUserActive.as_view(), name="check-user-active"),
 
@@ -81,6 +78,12 @@ urlpatterns = [
     path("version", views.VersionCheck.as_view(), name="versionCheck"),
 
     #Refferal Checker api
+    path('referral-info', views.GetReferralInfoAPI.as_view(), name='get_referral_info_api'),
 
+    #Verify pin
+    path('verify-user-pin', views.CheckVerificationPin.as_view(), name="verifyPin"),
+
+    #app reward
+    path('app-rate', views.AppRating.as_view(), name="apprate")
 
 ]

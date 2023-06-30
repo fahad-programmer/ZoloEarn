@@ -106,13 +106,12 @@ class ResetPassword(models.Model):
 
 
 class VerifyUser(models.Model):
-    pass
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     pin = models.CharField(max_length=4, null=False, blank=False, default=1)
-#     created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pin = models.CharField(max_length=4, null=False, blank=False, default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-#     def __str__(self) -> str:
-#         return f"{self.user.username} requested pin that is {self.pin}"
+    def __str__(self) -> str:
+        return f"{self.user.username} requested pin that is {self.pin}"
 
 
 class SocialAccount(models.Model):

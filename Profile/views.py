@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
+from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, VerificationPinSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
 from .models import HelpCenter, ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount, VerifyUser
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
@@ -111,6 +111,67 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({"message": "Username Or Password Is Incorrect"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+def SendVerificationEmail(username, email):
+    # Deleting all the objects that are old than 15 mins
+    VerifyUser.objects.filter(
+        created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
+
+    # Check if there is an existing VerifyUser object for the user
+    verify_user = VerifyUser.objects.filter(
+        user=User.objects.get(username=username)).first()
+
+    # If there is an existing VerifyUser object and it was created less than 15 minutes ago, return an error
+    if verify_user and timezone.now() < verify_user.created_at + timezone.timedelta(minutes=15):
+        time_diff = (verify_user.created_at +
+                     timezone.timedelta(minutes=5) - timezone.now()).seconds // 60
+        return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Generate a new PIN and create a new ResetPassword object for the user
+    pin = get_random_string(length=4, allowed_chars='1234567890')
+    verify_user_object = VerifyUser.objects.create(
+        user=User.objects.get(username=username), pin=pin)
+    verify_user_object.save()
+
+    # Sending the Email
+
+    context = {"username": User.objects.get(email=email).username, "pin": pin}
+    email_body = render_to_string('mail/verifyUser.html', context)
+
+    email = EmailMessage(
+        'Complete Your Signup On ZoloEarn',
+        email_body,
+        'zoloearn.llc@gmail.com',
+        to=[email]
+    )
+
+    email.content_subtype = 'html'
+    email.send()
+
+class CheckVerificationPin(APIView):
+    def post(self, request, format=None):
+        serializer = VerificationPinSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({'message': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            pin = serializer.validated_data['pin']
+            try:
+                verify_pin_obj = VerifyUser.objects.get(user=user)
+                if verify_pin_obj.pin == pin and timezone.now() <= verify_pin_obj.created_at + timezone.timedelta(minutes=5):
+                    return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'message': 'Invalid or expired PIN'}, status=status.HTTP_400_BAD_REQUEST)
+            except ResetPassword.DoesNotExist:
+                return Response({'message': 'No reset password request found for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 class TransactionListView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = TransactionSerializer
@@ -118,6 +179,23 @@ class TransactionListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Transaction.objects.filter(user=user)
+    
+
+class AppRating(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args):
+        user_wallet = Wallet.objects.get(user=request.user)
+        user_wallet.points += 30
+
+        # Adding entry to recent earnings
+        user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="App Rating", point_earned=30)
+        user_recent_earning.save()
+
+        return Response({"message": "Done"}, status=status.HTTP_200_OK)
+
+
+        
 
 
 class ReferralView(APIView):
@@ -179,18 +257,6 @@ class ReferralView(APIView):
 
 
 
-class ResendVerificationEmail(APIView):
-    def post(self, request):
-        email = request.data.get('email')
-        try:
-            user = User.objects.get(email=email)
-            if user.is_active:
-                return Response({"message": "Your account is already verified."}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                send_email(user=user)
-                return Response({"message": "Email has been sent successfully."}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({"message": "User with this email does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CheckUserActive(APIView):
@@ -235,41 +301,7 @@ class ReferralList(APIView):
         return Response(serializer.data)
 
 
-def SendVerificationEmail(username, email):
-    # Deleting all the objects that are old than 15 mins
-    VerifyUser.objects.filter(
-        created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
 
-    # Check if there is an existing ResetPassword object for the user
-    verify_user = VerifyUser.objects.filter(
-        user=User.objects.get(username=username)).first()
-
-    # If there is an existing ResetPassword object and it was created less than 15 minutes ago, return an error
-    if verify_user and timezone.now() < verify_user.created_at + timezone.timedelta(minutes=15):
-        time_diff = (verify_user.created_at +
-                     timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
-        return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Generate a new PIN and create a new ResetPassword object for the user
-    pin = get_random_string(length=4, allowed_chars='1234567890')
-    verify_user_object = VerifyUser.objects.create(
-        user=User.objects.get(username=username), pin=pin)
-    verify_user_object.save()
-
-    # Sending the Email
-
-    context = {"username": User.objects.get(email=email).username, "pin": pin}
-    email_body = render_to_string('mail/forget_email.html', context)
-
-    email = EmailMessage(
-        'Password Reset for Zolo Earn App',
-        email_body,
-        'zoloearn.llc@gmail.com',
-        to=[email]
-    )
-
-    email.content_subtype = 'html'
-    email.send()
 
 
 class ForgotPasswordView(APIView):
@@ -663,3 +695,24 @@ class VersionCheck(APIView):
     def get(self, request, *args, **kwargs):
         latest_version = "2.3"
         return Response({"message": latest_version})
+
+
+
+class GetReferralInfoAPI(APIView):
+    # Getting the list of Referrals for the User
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, format=None):
+        user_code = request.user.profile.user_code
+
+        referrals = Referral.objects.filter(code=user_code)
+        referral_data = []
+
+        for referral in referrals:
+            referred_user = referral.user.user.username
+            wallet = Wallet.objects.get(user=referral.user.user)
+            referred_wallet_points = wallet.points
+
+            referral_data.append({'referred_user': referred_user, 'wallet_points': referred_wallet_points})
+
+        return Response(referral_data)
