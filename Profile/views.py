@@ -25,8 +25,7 @@ last_email_sent = {}
 
 User = get_user_model()
 
-ALLOWED_EMAIL_PROVIDERS = ["tutanota.com", "protonmail.com", "zoho.com", "hubspot.com", "mail.com", "gmx.com", "yandex.com",
-                           "pm.com", 'gmail.com', 'yahoo.com', 'icloud.com', "outlook.com", "hotmail.com", "aol.com", "aim.com", "titan.email"]
+ALLOWED_EMAIL_PROVIDERS = ['gmail.com']
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -46,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
             domain = email.split('@')[1]
             if domain not in ALLOWED_EMAIL_PROVIDERS:
                 # Return an error response if email provider is not allowed
-                return Response({"message": "Signups from this email provider are not allowed."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Please Use Gmail Account Only"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             # Return an error response if email is not provided
             return Response({"message": "Please provide an email address."}, status=status.HTTP_400_BAD_REQUEST)
