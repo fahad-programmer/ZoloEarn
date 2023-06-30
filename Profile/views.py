@@ -155,14 +155,12 @@ class ReferralView(APIView):
 
             # Add points to the referrer's wallet and create a new referral
             referrer_wallet = Wallet.objects.get(user=current_user)
-            Referral.objects.create(
-                user=Profile.objects.get(user=current_user), code=code)
+            Referral.objects.create(user=Profile.objects.get(user=current_user), code=code)
             referrer_wallet.points += 50
             referrer_wallet.save()
 
-            # Writing the earning history from database
-            referrer_earning = RecentEarnings.objects.create(
-                user=current_user, way_to_earn="Referral Points", point_earned=50)
+            #Writing the earning history from database
+            referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points", point_earned=50)
             referrer_earning.save()
 
             # Add points to the referred user's wallet
@@ -170,9 +168,8 @@ class ReferralView(APIView):
             referred_user_wallet.points += 25
             referred_user_wallet.save()
 
-            # Writing the earning history from database
-            referrerd_earning = RecentEarnings.objects.create(
-                user=referred_user, way_to_earn="Referral Points", point_earned=25)
+            #Writing the earning history from database
+            referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points", point_earned=25)
             referrerd_earning.save()
 
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
