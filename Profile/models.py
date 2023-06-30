@@ -19,6 +19,8 @@ def generate_unique_code():
     return code
 
 
+
+
 def generate_username(email):
     # Get the username from the email by removing the domain name
     username = email.split('@')[0]

@@ -78,6 +78,9 @@ urlpatterns = [
     path('helpcenter', views.HelpCenterAPIView.as_view(), name='helpcenter-list'),
 
     #Version Control api
-    path("version", views.VersionCheck.as_view(), name="versionCheck")
+    path("version", views.VersionCheck.as_view(), name="versionCheck"),
+
+    #Refferal Checker api
+
 
 ]
