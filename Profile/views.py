@@ -138,7 +138,7 @@ def SendVerificationEmail(username, email):
     email_body = render_to_string('mail/verifyUser.Html', context)
 
     email = EmailMessage(
-        'Complete Your Signup On ZoloEarn',
+        f'{pin} is your pin for ZoloEarn App',
         email_body,
         'zoloearn.llc@gmail.com',
         to=[email]
@@ -191,6 +191,7 @@ class AppRating(APIView):
     def post(self, request, *args):
         user_wallet = Wallet.objects.get(user=request.user)
         user_wallet.points += 30
+        user_wallet.save()
 
         # Adding entry to recent earnings
         user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="App Rating", point_earned=30)
