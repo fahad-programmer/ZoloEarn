@@ -189,16 +189,22 @@ class AppRating(APIView):
     authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args):
-        user_wallet = Wallet.objects.get(user=request.user)
+        # Check if the user already has an object for App rating
+        user = request.user
+        existing_rating = RecentEarnings.objects.filter(user=user, way_to_earn='App Rating').exists()
+
+        if existing_rating:
+            return Response({'message': 'You have already received points for App rating.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_wallet = Wallet.objects.get(user=user)
         user_wallet.points += 30
         user_wallet.save()
 
         # Adding entry to recent earnings
-        user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="App Rating", point_earned=30)
+        user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="App Rating", point_earned=30)
         user_recent_earning.save()
 
-        return Response({"message": "Done"}, status=status.HTTP_200_OK)
-
+        return Response({"message": "Points added for App rating."}, status=status.HTTP_200_OK)
 
         
 
