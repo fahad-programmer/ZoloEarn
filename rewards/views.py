@@ -92,7 +92,7 @@ class DailyCheckIn(APIView):
         last_claimed = RecentEarnings.objects.filter(
             user=user, way_to_earn='Daily Check-In').order_by('-created_at').first()
 
-        if last_claimed and last_claimed.created_at >= timezone.now().date():
+        if last_claimed and last_claimed.created_at.date() == timezone.now().date():
             # User has already claimed the award today
             return Response({'message': 'You have already claimed the award today.'}, status=400)
 

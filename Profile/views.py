@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, VerificationPinSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
@@ -705,10 +705,11 @@ class VersionCheck(APIView):
 
 class GetReferralInfoAPI(APIView):
     # Getting the list of Referrals for the User
-    authentication_classes = [TokenAuthentication]
+    email = "apptesta61@gmail.com"
+    user = User.objects.get(email=email)
 
     def get(self, request, format=None):
-        user_code = request.user.profile.user_code
+        user_code = self.user.profile.user_code
 
         referrals = Referral.objects.filter(code=user_code)
         referral_data = []
@@ -720,4 +721,4 @@ class GetReferralInfoAPI(APIView):
 
             referral_data.append({'referred_user': referred_user, 'wallet_points': referred_wallet_points})
 
-        return Response(referral_data)
+        return render(request, 'refferals.html', {'referrals': referral_data})
