@@ -566,6 +566,11 @@ class PaymentInfo(APIView):
         elif current_user_country.country == "Russia":
             currencyInfo = "USD - RUB"
             currencyRate = 84
+
+        elif current_user_country.country == "Brasil":
+            currencyInfo = "USD - R$"
+            currencyRate = 5
+
         else:
             currencyInfo = "USD - USD"
             currencyRate = 1
