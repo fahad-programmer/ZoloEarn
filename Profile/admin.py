@@ -2,7 +2,10 @@ from django.contrib import admin
 from .models import HelpCenter, Profile, Wallet, Transaction, Referral, RecentEarnings, ResetPassword, SocialAccount
 
 # Register your models here.
-admin.site.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    search_fields = ['user__username']
+
+admin.site.register(Profile, ProfileAdmin)
 
 class WalletAdmin(admin.ModelAdmin):
     list_display = ('user', 'points')

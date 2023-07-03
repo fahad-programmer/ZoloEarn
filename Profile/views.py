@@ -623,7 +623,7 @@ class TransactionCreateView(APIView):
 
             if userProfile.new_user:
                 if userWallet.points >= userAmount:
-                    if userAmount >= 5000:
+                    if userAmount >= 4500:
                         userWallet.points -= userAmount
                         # Set new user to false
                         userProfile.new_user = False
@@ -709,7 +709,7 @@ class HelpCenterAPIView(APIView):
 
 class VersionCheck(APIView):
     def get(self, request, *args, **kwargs):
-        latest_version = "2.3.1"
+        latest_version = "2.3.2"
         return Response({"message": latest_version})
 
 

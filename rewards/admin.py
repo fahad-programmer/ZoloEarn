@@ -2,7 +2,12 @@ from django.contrib import admin
 from .models import SpinWheel, TickTacToe, MonsterHunter, Quiz, Questions, Subject
 
 # Register your models here.
-admin.site.register(SpinWheel)
+
+class SpinWheelModel(admin.ModelAdmin):
+    search_fields = ['user__username']
+admin.site.register(SpinWheel, SpinWheelModel)
+
+
 admin.site.register(TickTacToe)
 admin.site.register(MonsterHunter)
 admin.site.register(Questions)
