@@ -2,8 +2,12 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer,  ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, VerificationPinSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
-from .models import HelpCenter, ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount, VerifyUser
+from .serializers import CreateTransactionSerializer, HelpCenterSerializer, PaymentInfoSerializer, ProfileSerializer, \
+    RecentEarningsSerializer, UserSerializer, TransactionSerializer, ReferralSerializer, GetReferralSerializer, \
+    ForgotPasswordSerializer, ForgotPasswordCheckPinSerializer, UserResetPassword, SocialAccountSerializer, \
+    VerificationPinSerializer, generate_username, UserStatsSerializer, ProfileImageSerializer
+from .models import HelpCenter, ResetPassword, Transaction, Referral, Wallet, Profile, RecentEarnings, SocialAccount, \
+    VerifyUser
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -53,7 +57,8 @@ class UserViewSet(viewsets.ModelViewSet):
         # Checking Profile Database for the device id
         check_profile_data = Profile.objects.filter(device_id=device_id)
         if len(check_profile_data) == 3:  # If more than 3 accounts found error is returned
-            return Response({"message": "No More Accounts Can Be Created On This Device"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "No More Accounts Can Be Created On This Device"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # Create a UserSerializer instance with request data
         serializer = self.get_serializer(data=request.data)
@@ -73,7 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
             # Get response headers
             headers = self.get_success_headers(serializer.data)
 
-            # Set user as inactive and send an email to activate the account
+            # Set user as inactive and email activate the account
             user = User.objects.get(pk=serializer.data['id'])
             user.is_active = False
             user.save()
@@ -94,7 +99,8 @@ class UserViewSet(viewsets.ModelViewSet):
         token, created = Token.objects.get_or_create(user=user)
 
         # Return the token in the response
-        return Response({'token': token.key, "message": "Account created."}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'token': token.key, "message": "Account created."}, status=status.HTTP_201_CREATED,
+                        headers=headers)
 
     def login(self, request, *args, **kwargs):
         username = request.data.get('username')
@@ -105,14 +111,14 @@ class UserViewSet(viewsets.ModelViewSet):
             if user.is_active:
                 return Response({'token': token.key, "message": "verified"})
             else:
-                return Response({"message": "non-verified", "token": token.key}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+                return Response({"message": "non-verified", "token": token.key},
+                                status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
         else:
             return Response({"message": "Username Or Password Is Incorrect"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 def SendVerificationEmail(username, email):
-    # Deleting all the objects that are old than 15 mins
+    # Deleting all the objects that are older than 15 mins
     VerifyUser.objects.filter(
         created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
 
@@ -120,11 +126,12 @@ def SendVerificationEmail(username, email):
     verify_user = VerifyUser.objects.filter(
         user=User.objects.get(username=username)).first()
 
-    # If there is an existing VerifyUser object and it was created less than 15 minutes ago, return an error
+    # If there is an existing VerifyUser object, and it was created less than 15 minutes ago, return an error
     if verify_user and timezone.now() < verify_user.created_at + timezone.timedelta(minutes=15):
         time_diff = (verify_user.created_at +
                      timezone.timedelta(minutes=5) - timezone.now()).seconds // 60
-        return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Generate a new PIN and create a new ResetPassword object for the user
     pin = get_random_string(length=4, allowed_chars='1234567890')
@@ -147,8 +154,9 @@ def SendVerificationEmail(username, email):
     email.content_subtype = 'html'
     email.send()
 
+
 class CheckVerificationPin(APIView):
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = VerificationPinSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
@@ -160,20 +168,20 @@ class CheckVerificationPin(APIView):
             pin = serializer.validated_data['pin']
             try:
                 verify_pin_obj = VerifyUser.objects.get(user=user)
-                if verify_pin_obj.pin == pin and timezone.now() <= verify_pin_obj.created_at + timezone.timedelta(minutes=5):
+                if verify_pin_obj.pin == pin and timezone.now() <= verify_pin_obj.created_at + timezone.timedelta(
+                        minutes=5):
                     user.is_active = True
                     user.save()
                     return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
                 elif timezone.now() > verify_pin_obj.created_at + timezone.timedelta(minutes=5):
                     user.delete()
-                    return Response({"message":"The Pin Is Expired Please Signup Again"})
+                    return Response({"message": "The Pin Is Expired Please Signup Again"})
                 else:
                     return Response({'message': 'Invalid or expired PIN'}, status=status.HTTP_400_BAD_REQUEST)
             except ResetPassword.DoesNotExist:
-                return Response({'message': 'No reset password request found for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'No reset password request found for this user.'},
+                                status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class TransactionListView(generics.ListAPIView):
@@ -183,7 +191,7 @@ class TransactionListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Transaction.objects.filter(user=user)
-    
+
 
 class AppRating(APIView):
     authentication_classes = [TokenAuthentication]
@@ -194,7 +202,8 @@ class AppRating(APIView):
         existing_rating = RecentEarnings.objects.filter(user=user, way_to_earn='App Rating').exists()
 
         if existing_rating:
-            return Response({'message': 'You have already received points for App rating.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'You have already received points for App rating.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         user_wallet = Wallet.objects.get(user=user)
         user_wallet.points += 30
@@ -206,15 +215,13 @@ class AppRating(APIView):
 
         return Response({"message": "Points added for App rating."}, status=status.HTTP_200_OK)
 
-        
-
 
 class ReferralView(APIView):
     authentication_classes = [TokenAuthentication]
     queryset = Referral.objects.all()
     serializer_class = ReferralSerializer
 
-    def post(self, request, format=None):
+    def post(self, request):
         # Deserialize the request data using the ReferralSerializer
         serializer = ReferralSerializer(data=request.data)
 
@@ -248,8 +255,9 @@ class ReferralView(APIView):
             referrer_wallet.points += 50
             referrer_wallet.save()
 
-            #Writing the earning history from database
-            referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points", point_earned=50)
+            # Writing the earning history from database
+            referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points",
+                                                             point_earned=50)
             referrer_earning.save()
 
             # Add points to the referred user's wallet
@@ -257,8 +265,9 @@ class ReferralView(APIView):
             referred_user_wallet.points += 25
             referred_user_wallet.save()
 
-            #Writing the earning history from database
-            referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points", point_earned=25)
+            # Writing the earning history from database
+            referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points",
+                                                              point_earned=25)
             referrerd_earning.save()
 
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
@@ -266,12 +275,8 @@ class ReferralView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
 class CheckUserActive(APIView):
-    def get(self, request, token, format=None):
+    def get(self, request, token):
         try:
             token_obj = get_object_or_404(Token, key=token)
             user = token_obj.user
@@ -285,8 +290,7 @@ class CheckUserActive(APIView):
 
 
 class UserCodeAPIView(APIView):
-
-    # Getting this User Refferal Code
+    # Getting this User Referral Code
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -301,24 +305,20 @@ class UserCodeAPIView(APIView):
 
 
 class ReferralList(APIView):
-
     # Getting the list of Refferal For the User
     authentication_classes = [TokenAuthentication]
 
-    def get(self, request, format=None):
+    def get(self, request):
         referrals = Referral.objects.filter(
             code=request.user.profile.user_code)
         serializer = GetReferralSerializer(referrals, many=True)
         return Response(serializer.data)
 
 
-
-
-
 class ForgotPasswordView(APIView):
     def post(self, request, format=None):
 
-        # Deleting all the objects that are old than 15 mins
+        # Deleting all the objects that are elder than 15 mains
         ResetPassword.objects.filter(
             created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
 
@@ -337,7 +337,8 @@ class ForgotPasswordView(APIView):
             if reset_password and timezone.now() < reset_password.created_at + timezone.timedelta(minutes=15):
                 time_diff = (reset_password.created_at +
                              timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
-                return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'Please wait {time_diff} minutes before requesting a new PIN.'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
             # Generate a new PIN and create a new ResetPassword object for the user
             pin = get_random_string(length=4, allowed_chars='1234567890')
@@ -361,12 +362,13 @@ class ForgotPasswordView(APIView):
             email.content_subtype = 'html'
             email.send()
 
-            return Response({'message': 'An email has been sent to you with your password reset PIN.'}, status=status.HTTP_200_OK)
+            return Response({'message': 'An email has been sent to you with your password reset PIN.'},
+                            status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CheckForgotPasswordPin(APIView):
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = ForgotPasswordCheckPinSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
@@ -378,17 +380,19 @@ class CheckForgotPasswordPin(APIView):
             pin = serializer.validated_data['pin']
             try:
                 reset_password_obj = ResetPassword.objects.get(user=user)
-                if reset_password_obj.pin == pin and timezone.now() <= reset_password_obj.created_at + timezone.timedelta(minutes=15):
+                if reset_password_obj.pin == pin and timezone.now() <= reset_password_obj.created_at + timezone.timedelta(
+                        minutes=15):
                     return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
                 else:
                     return Response({'message': 'Invalid or expired PIN'}, status=status.HTTP_400_BAD_REQUEST)
             except ResetPassword.DoesNotExist:
-                return Response({'message': 'No reset password request found for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'No reset password request found for this user.'},
+                                status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserResetPasswordView(APIView):
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = UserResetPassword(data=request.data)
 
         # Setting the password and validating the inputs
@@ -407,7 +411,7 @@ class UserResetPasswordView(APIView):
                 'mail/password_change_notification.html', context)
 
             email = EmailMessage(
-                'Password Reset Succesful',
+                'Password Reset Successful',
                 email_body,
                 'zoloearn.llc@gmail.com',
                 to=[email]
@@ -440,7 +444,8 @@ class SocialAccountApi(viewsets.ModelViewSet):
             # Checking Profile Database for the device id
             check_profile_data = Profile.objects.filter(device_id=device_id)
             if len(check_profile_data) == 3:  # If more than 3 accounts found error is returned
-                return Response({"message": "No More Accounts Can Be Created On This Device"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "No More Accounts Can Be Created On This Device"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
             # First creating the simple User object and generating a username
             userObjectUsername = generate_username(email=email)
@@ -464,7 +469,7 @@ class SocialAccountApi(viewsets.ModelViewSet):
 
             return Response({"token": token.key, "message": "Account Created"}, status=status.HTTP_200_OK)
 
-    def login(self, request, format=None):
+    def login(self, request):
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -515,10 +520,10 @@ class ProfileImageSelector(APIView):
             get_profile_user.profile_pic_path = image_path
             get_profile_user.save()
 
-            return Response({"message": "Profile Pic Succesfully Selected"}, status=status.HTTP_200_OK)
+            return Response({"message": "Profile Pic Successfully Selected"}, status=status.HTTP_200_OK)
 
         else:
-            return Response({"message": "Some Error Occured Try Again Later"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Some Error Occurred Try Again Later"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AvailablePaymentMethods(APIView):
@@ -541,8 +546,6 @@ class AvailablePaymentMethods(APIView):
         else:
             available_payment_methods = ["Paypal", "Bitcoin", "Google Pay"]
             return Response({"methods": available_payment_methods}, status=status.HTTP_200_OK)
-
-        return Response({"message": "Some Error Ocuured"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PaymentInfo(APIView):
@@ -581,7 +584,6 @@ class PaymentInfo(APIView):
 
 
 class ProfileAPIView(APIView):
-
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
@@ -646,7 +648,8 @@ class TransactionCreateView(APIView):
                         serializer.save(user=user)
                         return Response({"message": "Withdrawal Successful"}, status=status.HTTP_200_OK)
                     else:
-                        return Response({"message": "Points Less Than Minimum Withdraw (Changes Made Recently)"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"message": "Points Less Than Minimum Withdraw (Changes Made Recently)"},
+                                        status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"message": "Not Enough Points In Wallet"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -679,7 +682,8 @@ class UpdatePasswordView(APIView):
 
         # Check if the new password and confirm password match
         if new_password != confirm_password:
-            return Response({'message': 'New password and confirm password do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'New password and confirm password do not match.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # Update the user's password
         user.set_password(new_password)
@@ -689,14 +693,14 @@ class UpdatePasswordView(APIView):
 
 
 class HelpCenterAPIView(APIView):
-
     authentication_classes = [TokenAuthentication]
 
     def post(self, request):
         user = request.user
         # Check if the user already has an instance of HelpCenter
         if HelpCenter.objects.filter(user=user).exists():
-            return Response({"message": "You can only have one instance of HelpCenter."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "You can only have one instance of HelpCenter."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # Create a new HelpCenter instance
         serializer = HelpCenterSerializer(data=request.data)
@@ -711,7 +715,6 @@ class VersionCheck(APIView):
     def get(self, request, *args, **kwargs):
         latest_version = "2.3.3"
         return Response({"message": latest_version})
-
 
 
 class GetReferralInfoAPI(APIView):

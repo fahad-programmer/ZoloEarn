@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 
+
 # Create your models here.
 
 def generate_unique_code():
@@ -17,8 +18,6 @@ def generate_unique_code():
         if Profile.objects.filter(user_code=code).count() == 0:
             break
     return code
-
-
 
 
 def generate_username(email):
@@ -31,6 +30,7 @@ def generate_username(email):
         username += '_' + get_random_string(length=5)
 
     return username
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -49,6 +49,7 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return self.user.username
+
 
 class Wallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -74,6 +75,7 @@ class Transaction(models.Model):
     def __str__(self) -> str:
         return f"{self.user.username} made a transaction of {self.points} points via {self.payment_method}"
 
+
 class RecentEarnings(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     way_to_earn = models.CharField(max_length=300, blank=True, null=True)
@@ -82,18 +84,18 @@ class RecentEarnings(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.first_name} earned {self.point_earned} through {self.way_to_earn}"
-     
+
 
 class Referral(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     code = models.CharField(max_length=7, null=True, blank=True)
     signed_up_at = models.DateField(default=timezone.now().date())
 
-
     def __str__(self) -> str:
         referred_user = self.user.user.username
         referred_by = Profile.objects.get(user_code=self.code).user.username
         return f"The user {referred_user} was referred by the user {referred_by} at {self.signed_up_at}"
+
 
 class ResetPassword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -102,7 +104,6 @@ class ResetPassword(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} requested pin that is {self.pin}"
-    
 
 
 class VerifyUser(models.Model):
@@ -120,10 +121,9 @@ class SocialAccount(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} created account using google"
-    
+
 
 class HelpCenter(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.CharField(max_length=1000)
     message = models.CharField(max_length=10000)
-    

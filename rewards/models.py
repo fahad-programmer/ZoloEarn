@@ -2,10 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from django.core.validators import MaxValueValidator, MinValueValidator 
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 # Create your models here.
 
+# noinspection PyMethodParameters,PyUnresolvedReferences
 class SpinWheel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     spin_available = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), MaxValueValidator(5)])
@@ -18,6 +20,7 @@ class SpinWheel(models.Model):
 
     def __str__(self) -> str:
         return self.user.first_name
+
 
 class MonsterHunter(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -32,7 +35,6 @@ class MonsterHunter(models.Model):
     def __str__(self) -> str:
         return self.user.first_name
 
-    
 
 class TickTacToe(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -67,7 +69,6 @@ class Subject(models.Model):
 
     def __str__(self) -> str:
         return self.subject
-    
 
 
 class Questions(models.Model):

@@ -1,373 +1,62 @@
 [
   {
-    "subject": "Geography",
-    "question": "Which is the largest ocean in the world?",
-    "choices": ["Pacific Ocean", "Atlantic Ocean", "Indian Ocean", "Arctic Ocean"],
-    "correct_answer": "Pacific Ocean"
+    "subject": "Biology",
+    "question": "Which enzyme converts glucose to glycogen?",
+    "choices": ["Amylase", "Lipase", "Glycogenase", "Glucokinase"],
+    "correct_answer": "Glucokinase"
   },
   {
-    "subject": "Geography",
-    "question": "What is the capital city of Australia?",
-    "choices": ["Sydney", "Melbourne", "Canberra", "Perth"],
-    "correct_answer": "Canberra"
+    "subject": "Biology",
+    "question": "Which hormone regulates blood calcium levels?",
+    "choices": ["Insulin", "Cortisol", "Calcitonin", "Progesterone"],
+    "correct_answer": "Calcitonin"
   },
   {
-    "subject": "Geography",
-    "question": "Which is the longest river in Africa?",
-    "choices": ["Nile River", "Congo River", "Zambezi River", "Niger River"],
-    "correct_answer": "Nile River"
+    "subject": "Biology",
+    "question": "What is the role of the Golgi apparatus in a cell?",
+    "choices": ["Protein synthesis", "Energy production", "Cell division", "Packaging and modifying proteins"],
+    "correct_answer": "Packaging and modifying proteins"
   },
   {
-    "subject": "Geography",
-    "question": "Which country is known as the 'Land of the Rising Sun'?",
-    "choices": ["China", "Japan", "South Korea", "Thailand"],
-    "correct_answer": "Japan"
+    "subject": "Biology",
+    "question": "What is the function of the semicircular canals in the human ear?",
+    "choices": ["Sense temperature", "Maintain balance", "Detect light intensity", "Produce sound waves"],
+    "correct_answer": "Maintain balance"
   },
   {
-    "subject": "Geography",
-    "question": "Which is the largest desert in the world?",
-    "choices": ["Sahara Desert", "Gobi Desert", "Arabian Desert", "Kalahari Desert"],
-    "correct_answer": "Sahara Desert"
+    "subject": "Biology",
+    "question": "Which part of the brain is responsible for regulating body temperature?",
+    "choices": ["Cerebrum", "Cerebellum", "Hypothalamus", "Medulla oblongata"],
+    "correct_answer": "Hypothalamus"
   },
   {
-    "subject": "Geography",
-    "question": "Which continent is the driest inhabited continent on Earth?",
-    "choices": ["Africa", "Asia", "Australia", "South America"],
-    "correct_answer": "Australia"
+    "subject": "Biology",
+    "question": "Which process involves the exchange of gases between the alveoli and the blood?",
+    "choices": ["Osmosis", "Filtration", "Diffusion", "Active transport"],
+    "correct_answer": "Diffusion"
   },
   {
-    "subject": "Geography",
-    "question": "What is the tallest mountain in the world?",
-    "choices": ["Mount Everest", "K2", "Kangchenjunga", "Makalu"],
-    "correct_answer": "Mount Everest"
+    "subject": "Biology",
+    "question": "What is the largest known species of shark?",
+    "choices": ["Great white shark", "Whale shark", "Tiger shark", "Hammerhead shark"],
+    "correct_answer": "Whale shark"
   },
   {
-    "subject": "Geography",
-    "question": "Which country is the largest producer of oil in the world?",
-    "choices": ["Saudi Arabia", "Russia", "United States", "China"],
-    "correct_answer": "Saudi Arabia"
+    "subject": "Biology",
+    "question": "Which part of a plant is responsible for water absorption?",
+    "choices": ["Roots", "Stems", "Leaves", "Flowers"],
+    "correct_answer": "Roots"
   },
   {
-    "subject": "Geography",
-    "question": "What is the largest country by land area in the world?",
-    "choices": ["Russia", "Canada", "China", "United States"],
-    "correct_answer": "Russia"
+    "subject": "Biology",
+    "question": "Which process involves the production of gametes?",
+    "choices": ["Fertilization", "Mitosis", "Meiosis", "Budding"],
+    "correct_answer": "Meiosis"
   },
   {
-    "subject": "Geography",
-    "question": "Which is the smallest continent in the world?",
-    "choices": ["Africa", "Asia", "Australia", "Europe"],
-    "correct_answer": "Australia"
-  },
-  {
-    "subject": "Geography",
-    "question": "What is the capital city of Brazil?",
-    "choices": ["Sao Paulo", "Rio de Janeiro", "Brasilia", "Salvador"],
-    "correct_answer": "Brasilia"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which is the largest country in South America?",
-    "choices": ["Brazil", "Argentina", "Colombia", "Peru"],
-    "correct_answer": "Brazil"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which is the largest island in the world?",
-    "choices": ["Greenland", "Madagascar", "Borneo", "New Guinea"],
-    "correct_answer": "Greenland"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which is the capital city of Canada?",
-    "choices": ["Toronto", "Ottawa", "Montreal", "Vancouver"],
-    "correct_answer": "Ottawa"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which country is known as the 'Land of Smiles'?",
-    "choices": ["Thailand", "Indonesia", "Vietnam", "Malaysia"],
-    "correct_answer": "Thailand"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which is the largest lake in Africa?",
-    "choices": ["Lake Victoria", "Lake Tanganyika", "Lake Malawi", "Lake Chad"],
-    "correct_answer": "Lake Victoria"
-  },
-  {
-    "subject": "Geography",
-    "question": "What is the official language of India?",
-    "choices": ["Hindi", "English", "Bengali", "Tamil"],
-    "correct_answer": "Hindi"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which is the highest waterfall in the world?",
-    "choices": ["Angel Falls", "Niagara Falls", "Iguazu Falls", "Victoria Falls"],
-    "correct_answer": "Angel Falls"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which is the largest city in Africa by population?",
-    "choices": ["Cairo", "Lagos", "Kinshasa", "Johannesburg"],
-    "correct_answer": "Lagos"
-  },
-  {
-    "subject": "Geography",
-    "question": "What is the capital city of France?",
-    "choices": ["Paris", "Rome", "Berlin", "London"],
-    "correct_answer": "Paris"
-  },
-  {
-    "subject": "Geography",
-    "question": "Which country is located on the Iberian Peninsula?",
-    "choices": ["Spain", "Italy", "Greece", "Sweden"],
-    "correct_answer": "Spain"
-  },
-    {
-      "subject": "Chemistry",
-      "question": "What is the atomic number of carbon?",
-      "choices": ["4", "6", "8", "12"],
-      "correct_answer": "6"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which element is represented by the symbol Fe?",
-      "choices": ["Iron", "Silver", "Gold", "Copper"],
-      "correct_answer": "Iron"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the chemical symbol for sodium?",
-      "choices": ["So", "Na", "Sn", "Ni"],
-      "correct_answer": "Na"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the formula for water?",
-      "choices": ["H2O2", "H2O", "HO", "H3O"],
-      "correct_answer": "H2O"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which gas makes up the majority of Earth's atmosphere?",
-      "choices": ["Nitrogen", "Oxygen", "Carbon dioxide", "Hydrogen"],
-      "correct_answer": "Nitrogen"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the pH value of a neutral solution?",
-      "choices": ["0", "7", "14", "10"],
-      "correct_answer": "7"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which element is used as a fuel in nuclear reactors?",
-      "choices": ["Uranium", "Plutonium", "Thorium", "Radon"],
-      "correct_answer": "Uranium"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the chemical formula for methane?",
-      "choices": ["CH3", "CO2", "H2O", "C6H12O6"],
-      "correct_answer": "CH4"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which is the lightest noble gas?",
-      "choices": ["Helium", "Neon", "Argon", "Xenon"],
-      "correct_answer": "Helium"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the process of converting a solid directly into a gas called?",
-      "choices": ["Sublimation", "Evaporation", "Condensation", "Melting"],
-      "correct_answer": "Sublimation"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the chemical symbol for gold?",
-      "choices": ["Ag", "Au", "Cu", "Pt"],
-      "correct_answer": "Au"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which is the lightest halogen?",
-      "choices": ["Fluorine", "Chlorine", "Bromine", "Iodine"],
-      "correct_answer": "Fluorine"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the chemical formula for table salt?",
-      "choices": ["NaCl", "KCl", "CaCl2", "MgCl2"],
-      "correct_answer": "NaCl"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which gas is produced during photosynthesis?",
-      "choices": ["Oxygen", "Carbon dioxide", "Hydrogen", "Methane"],
-      "correct_answer": "Oxygen"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the chemical formula for sulfuric acid?",
-      "choices": ["H2SO4", "HCl", "HNO3", "CH3COOH"],
-      "correct_answer": "H2SO4"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which is the lightest alkali metal?",
-      "choices": ["Lithium", "Sodium", "Potassium", "Rubidium"],
-      "correct_answer": "Lithium"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the process of converting a gas into a liquid called?",
-      "choices": ["Condensation", "Evaporation", "Sublimation", "Melting"],
-      "correct_answer": "Condensation"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which element is the main component of natural gas?",
-      "choices": ["Methane", "Ethane", "Propane", "Butane"],
-      "correct_answer": "Methane"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "What is the chemical symbol for silver?",
-      "choices": ["Ag", "Au", "Cu", "Pt"],
-      "correct_answer": "Ag"
-    },
-    {
-      "subject": "Chemistry",
-      "question": "Which is the lightest alkaline earth metal?",
-      "choices": ["Beryllium", "Magnesium", "Calcium", "Strontium"],
-      "correct_answer": "Beryllium"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the powerhouse of the cell?",
-      "choices": ["Mitochondria", "Nucleus", "Ribosome", "Golgi apparatus"],
-      "correct_answer": "Mitochondria"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the largest organ in the human body?",
-      "choices": ["Heart", "Liver", "Brain", "Skin"],
-      "correct_answer": "Skin"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the process by which plants make their own food?",
-      "choices": ["Photosynthesis", "Respiration", "Fermentation", "Transpiration"],
-      "correct_answer": "Photosynthesis"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which blood type is considered the universal donor?",
-      "choices": ["A", "B", "AB", "O"],
-      "correct_answer": "O"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the largest organ in the human digestive system?",
-      "choices": ["Stomach", "Liver", "Small intestine", "Large intestine"],
-      "correct_answer": "Liver"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the process by which organisms release stored energy from food?",
-      "choices": ["Respiration", "Digestion", "Circulation", "Excretion"],
-      "correct_answer": "Respiration"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the smallest unit of life?",
-      "choices": ["Cell", "Tissue", "Organ", "Organ system"],
-      "correct_answer": "Cell"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the main function of white blood cells?",
-      "choices": ["Fight infection", "Carry oxygen", "Clot blood", "Filter waste"],
-      "correct_answer": "Fight infection"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the largest bone in the human body?",
-      "choices": ["Femur", "Skull", "Tibia", "Humerus"],
-      "correct_answer": "Femur"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the main function of the respiratory system?",
-      "choices": ["Exchange gases", "Pump blood", "Filter waste", "Produce hormones"],
-      "correct_answer": "Exchange gases"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which organ is responsible for filtering blood and producing urine?",
-      "choices": ["Kidney", "Bladder", "Liver", "Lung"],
-      "correct_answer": "Kidney"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the main function of red blood cells?",
-      "choices": ["Carry oxygen", "Fight infection", "Clot blood", "Filter waste"],
-      "correct_answer": "Carry oxygen"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the longest bone in the human body?",
-      "choices": ["Femur", "Tibia", "Humerus", "Radius"],
-      "correct_answer": "Femur"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the main function of the nervous system?",
-      "choices": ["Receive and transmit signals", "Produce hormones", "Pump blood", "Break down food"],
-      "correct_answer": "Receive and transmit signals"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the primary organ of the human respiratory system?",
-      "choices": ["Lungs", "Nose", "Mouth", "Trachea"],
-      "correct_answer": "Lungs"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the process by which organisms produce offspring of the same kind?",
-      "choices": ["Reproduction", "Growth", "Adaptation", "Metabolism"],
-      "correct_answer": "Reproduction"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the largest part of the human brain?",
-      "choices": ["Cerebrum", "Cerebellum", "Medulla oblongata", "Hypothalamus"],
-      "correct_answer": "Cerebrum"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the main function of the skeletal system?",
-      "choices": ["Support and protect the body", "Exchange gases", "Pump blood", "Filter waste"],
-      "correct_answer": "Support and protect the body"
-    },
-    {
-      "subject": "Biology",
-      "question": "Which is the largest cell in the human body?",
-      "choices": ["Egg cell", "Sperm cell", "Nerve cell", "Muscle cell"],
-      "correct_answer": "Egg cell"
-    },
-    {
-      "subject": "Biology",
-      "question": "What is the process by which plants lose water through their leaves?",
-      "choices": ["Transpiration", "Photosynthesis", "Respiration", "Absorption"],
-      "correct_answer": "Transpiration"
-    }
-
-  
-
-
-
+    "subject": "Biology",
+    "question": "Which blood vessel carries oxygenated blood back to the heart from the lungs?",
+    "choices": ["Aorta", "Pulmonary artery", "Pulmonary vein", "Vena cava"],
+    "correct_answer": "Pulmonary vein"
+  }
 ]
