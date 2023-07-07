@@ -145,7 +145,7 @@ class UserSpinTurn(APIView):
             spin_wheel.save()
 
         # Return the current spin availability for the user
-        return Response({'spin_available': spin_wheel.spin_available}, status=status.HTTP_200_OK)
+        return Response({'spin_available': str(spin_wheel.spin_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -160,7 +160,7 @@ class UserSpinFree(APIView):
         spin_wheel.spin_available += 1
         spin_wheel.save()
 
-        return Response({'spin_available': spin_wheel.spin_available}, status=status.HTTP_200_OK)
+        return Response({'spin_available': str(spin_wheel.spin_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -180,7 +180,7 @@ class UserTTCAvailableTurn(APIView):
             tt_object.turn_available = 10
             tt_object.save()
 
-        return Response({'turn_available': tt_object.turn_available}, status=status.HTTP_200_OK)
+        return Response({'turn_available': str(tt_object.turn_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -257,7 +257,7 @@ class MonsterHunterTurn(APIView):
             monster_hunter_object.turn_available = 2
             monster_hunter_object.save()
 
-        return Response({'turn_available': monster_hunter_object.turn_available}, status=status.HTTP_200_OK)
+        return Response({'turn_available': str(monster_hunter_object.turn_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -399,7 +399,7 @@ class QuizInTurns(APIView):
             quiz_obj.turn_available = 1
             quiz_obj.save()
 
-        return quiz_obj.turn_available
+        return str(quiz_obj.turn_available)
 
 
 # Function related to automating the quiz section
