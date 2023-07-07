@@ -59,31 +59,31 @@ urlpatterns = [
     # Payment Info
     path("paymentinfo", views.PaymentInfo.as_view(), name="PaymentInfo"),
 
-    #Get the profile info and also update
+    # Get the profile info and also update
     path('profile', views.ProfileAPIView.as_view(), name='profile'),
 
-    #Create a transaction
+    # Create a transaction
     path('checkout', views.TransactionCreateView.as_view(), name="withdraw"),
 
-    #Get user recent earnings
+    # Get user recent earnings
     path('recent-earnings', views.RecentEarningsView.as_view(), name='recent_earnings'),
 
-    #update the user password
+    # update the user password
     path('update-password', views.UpdatePasswordView.as_view(), name='update_password'),
 
-    #help center Api
+    # help center Api
     path('helpcenter', views.HelpCenterAPIView.as_view(), name='helpcenter-list'),
 
-    #Version Control api
+    # Version Control api
     path("version", views.VersionCheck.as_view(), name="versionCheck"),
 
-    #Refferal Checker api
+    # Refferal Checker api
     path('referral-info', views.GetReferralInfoAPI.as_view(), name='get_referral_info_api'),
 
-    #Verify pin
+    # Verify pin
     path('verify-user-pin', views.CheckVerificationPin.as_view(), name="verifyPin"),
 
-    #app reward
+    # app reward
     path('app-rate', views.AppRating.as_view(), name="apprate")
 
 ]

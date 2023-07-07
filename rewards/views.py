@@ -121,7 +121,7 @@ class WalletView(APIView):
 
         user_wallet = get_object_or_404(Wallet, user=user)
 
-        return Response({'points': user_wallet.points}, status=status.HTTP_200_OK)
+        return Response({'points': str(user_wallet.points)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
