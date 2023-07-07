@@ -121,7 +121,7 @@ class WalletView(APIView):
 
         user_wallet = get_object_or_404(Wallet, user=user)
 
-        return Response({'points': str(user_wallet.points)}, status=status.HTTP_200_OK)
+        return Response({'message': str(user_wallet.points)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -145,7 +145,7 @@ class UserSpinTurn(APIView):
             spin_wheel.save()
 
         # Return the current spin availability for the user
-        return Response({'spin_available': str(spin_wheel.spin_available)}, status=status.HTTP_200_OK)
+        return Response({'message': str(spin_wheel.spin_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -160,7 +160,7 @@ class UserSpinFree(APIView):
         spin_wheel.spin_available += 1
         spin_wheel.save()
 
-        return Response({'spin_available': str(spin_wheel.spin_available)}, status=status.HTTP_200_OK)
+        return Response({'message': str(spin_wheel.spin_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -180,7 +180,7 @@ class UserTTCAvailableTurn(APIView):
             tt_object.turn_available = 10
             tt_object.save()
 
-        return Response({'turn_available': str(tt_object.turn_available)}, status=status.HTTP_200_OK)
+        return Response({'message': str(tt_object.turn_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
@@ -257,7 +257,7 @@ class MonsterHunterTurn(APIView):
             monster_hunter_object.turn_available = 2
             monster_hunter_object.save()
 
-        return Response({'turn_available': str(monster_hunter_object.turn_available)}, status=status.HTTP_200_OK)
+        return Response({'message': str(monster_hunter_object.turn_available)}, status=status.HTTP_200_OK)
 
 
 # noinspection PyMethodMayBeStatic
