@@ -258,7 +258,7 @@ class MonsterHunterTurn(APIView):
                 userMonsterHunterObject.save()
             return Response({"message": str(userMonsterHunterObject.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Some Error Occurred"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MonsterHunterApi(viewsets.ModelViewSet):
@@ -270,7 +270,7 @@ class MonsterHunterApi(viewsets.ModelViewSet):
         if serializer.is_valid():
             points = serializer.validated_data['points']
 
-            # Add thoese points to wallet and deduct a turn
+            # Add these points to wallet and deduct a turn
             userWallet = Wallet.objects.get(user=request.user)
             userWallet.points += int(points)
             userWallet.save()
@@ -286,7 +286,7 @@ class MonsterHunterApi(viewsets.ModelViewSet):
 
             return Response({"message": "Done"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "something happend"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "something happened"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddMonsterHunterApi(APIView):
