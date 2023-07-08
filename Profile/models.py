@@ -3,7 +3,7 @@ import string
 from django.db import models
 from django.contrib.auth.models import User
 import os
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils.crypto import get_random_string
 from django.utils import timezone
@@ -92,9 +92,7 @@ class Referral(models.Model):
     signed_up_at = models.DateField(default=timezone.now().date())
 
     def __str__(self) -> str:
-        referred_user = self.user.user.username
-        referred_by = Profile.objects.get(user_code=self.code).user.username
-        return f"The user {referred_user} was referred by the user {referred_by} at {self.signed_up_at}"
+        return self.user.user.username
 
 
 class ResetPassword(models.Model):
