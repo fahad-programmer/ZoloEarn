@@ -4,12 +4,12 @@ from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import get_user_model
-from Profile.models import Wallet, RecentEarnings
+from Profile.models import Wallet, RecentEarnings, Profile
 from datetime import timedelta, timezone
 from datetime import timedelta
 from rest_framework import viewsets
 from django.utils import timezone
-from .models import SpinWheel, MonsterHunter, TickTacToe
+from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos
 from django.utils import timezone as django_timezone
 from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
 from .models import Subject, Quiz, Questions
@@ -270,7 +270,7 @@ class MonsterHunterApi(viewsets.ModelViewSet):
         if serializer.is_valid():
             points = serializer.validated_data['points']
 
-            # Add thoese points to wallet and deduct a turn
+            # Add these points to wallet and deduct a turn
             userWallet = Wallet.objects.get(user=request.user)
             userWallet.points += int(points)
             userWallet.save()
@@ -424,3 +424,35 @@ def load_questions_from_json_view(request):
     return HttpResponse("All Questions Added")
 
 
+class GetZoloVideos(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request):
+        # Current user
+        user = request.user
+
+        userZoloVideos = ZoloVideos.objects.get(user=user)
+        return Response({"videos": userZoloVideos.get_videos_by_country()})
+
+
+class ZoloVideoApi(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        userZoloVideoObj = ZoloVideos.objects.get(user=request.user)
+
+        userZoloVideoObj.videos_watched -= 1
+        userZoloVideoObj.save()
+
+        # Adding points to wallet
+        userWallet = Wallet.objects.get(user=request.user)
+
+        userWallet.points += 2
+        userWallet.save()
+
+        # Adding entry to recent earnings
+        user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Zolo Videos",
+                                                            point_earned=2)
+        user_recent_earning.save()
+
+        return Response({"message": "Completed the api transaction"})

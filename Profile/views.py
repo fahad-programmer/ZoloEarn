@@ -333,7 +333,7 @@ class ForgotPasswordView(APIView):
             # Check if there is an existing ResetPassword object for the user
             reset_password = ResetPassword.objects.filter(user=user).first()
 
-            # If there is an existing ResetPassword object and it was created less than 15 minutes ago, return an error
+            # If there is an existing ResetPassword object, and it was created less than 15 minutes ago, return an error
             if reset_password and timezone.now() < reset_password.created_at + timezone.timedelta(minutes=15):
                 time_diff = (reset_password.created_at +
                              timezone.timedelta(minutes=15) - timezone.now()).seconds // 60
