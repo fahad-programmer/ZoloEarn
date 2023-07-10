@@ -4,12 +4,12 @@ from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import get_user_model
-from Profile.models import Wallet, RecentEarnings
+from Profile.models import Wallet, RecentEarnings, Profile
 from datetime import timedelta, timezone
 from datetime import timedelta
 from rest_framework import viewsets
 from django.utils import timezone
-from .models import SpinWheel, MonsterHunter, TickTacToe
+from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos
 from django.utils import timezone as django_timezone
 from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
 from .models import Subject, Quiz, Questions
@@ -245,6 +245,7 @@ class MonsterHunterTurn(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, *args, **kwargs):
+
         user = request.user
 
         # Getting user turns
@@ -258,7 +259,7 @@ class MonsterHunterTurn(APIView):
                 userMonsterHunterObject.save()
             return Response({"message": str(userMonsterHunterObject.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message": "Some Error Occurred"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MonsterHunterApi(viewsets.ModelViewSet):
@@ -286,19 +287,7 @@ class MonsterHunterApi(viewsets.ModelViewSet):
 
             return Response({"message": "Done"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "something happened"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class AddMonsterHunterApi(APIView):
-    authentication_classes = [TokenAuthentication]
-
-    def post(self, request, *args):
-        # getting the user object of monster hunter
-        userMonsterHunterObj = MonsterHunter.objects.get(user=request.user)
-        userMonsterHunterObj.turn_available += 1
-        userMonsterHunterObj.save()
-
-        return Response({"message": "Done"}, status=status.HTTP_200_OK)
+            return Response({"message": "something happend"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuizInQuestions(viewsets.ModelViewSet):
@@ -379,6 +368,18 @@ class AddQuizInApi(APIView):
         return Response({"message": "Done"}, status=status.HTTP_200_OK)
 
 
+class AddMonsterHunterApi(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args):
+        # getting the user object of monster hunter
+        userMonsterHunterObj = MonsterHunter.objects.get(user=request.user)
+        userMonsterHunterObj.turn_available += 1
+        userMonsterHunterObj.save()
+
+        return Response({"message": "Done"}, status=status.HTTP_200_OK)
+
+
 class QuizInTurns(APIView):
     authentication_classes = [TokenAuthentication]
 
@@ -396,10 +397,10 @@ class QuizInTurns(APIView):
                 userQuizInObj.save()
             return Response({"message": str(userQuizInObj.turn_available)}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message": "Some Error Occured"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Some Error Occurred"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Function realted to automating the quiz section
+# Function related to automating the quiz section
 def load_questions_from_json_view(request):
     json_file = 'questions.json'  # Specify the path to your JSON file
 
@@ -424,3 +425,35 @@ def load_questions_from_json_view(request):
     return HttpResponse("All Questions Added")
 
 
+class GetZoloVideos(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request):
+        # Current user
+        user = request.user
+
+        userZoloVideos = ZoloVideos.objects.get(user=user)
+        return Response({"videos": userZoloVideos.get_videos_by_country()})
+
+
+class ZoloVideoApi(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        userZoloVideoObj = ZoloVideos.objects.get(user=request.user)
+
+        userZoloVideoObj.videos_watched -= 1
+        userZoloVideoObj.save()
+
+        # Adding points to wallet
+        userWallet = Wallet.objects.get(user=request.user)
+
+        userWallet.points += 2
+        userWallet.save()
+
+        # Adding entry to recent earnings
+        user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Zolo Videos",
+                                                            point_earned=2)
+        user_recent_earning.save()
+
+        return Response({"message": "Completed the api transaction"})

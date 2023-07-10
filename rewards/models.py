@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import CharField, Q
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -67,7 +68,7 @@ class Quiz(models.Model):
 class Subject(models.Model):
     subject = models.CharField(max_length=100)
 
-    def __str__(self) -> str:
+    def __str__(self) -> CharField:
         return self.subject
 
 
@@ -80,5 +81,42 @@ class Questions(models.Model):
     choice4 = models.CharField(max_length=200)
     answer = models.CharField(max_length=200)
 
-    def __str__(self) -> str:
+    def __str__(self) -> CharField:
         return self.question
+
+
+class ZoloVideos(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    videos_watched = models.PositiveIntegerField(default=20, validators=[MinValueValidator(0), MaxValueValidator(20)])
+    last_watched = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
+
+    def get_videos_by_country(self):
+        country = self.user.profile.country
+        videos = Videos.objects.filter(
+            Q(country=country) | Q(country='United States'),
+        ).values('videos').first()
+
+        watched_videos = self.videos_watched
+
+        if videos:
+            video_urls = videos['videos'].split(',')
+            unwatched_urls = video_urls[:watched_videos]
+            return unwatched_urls
+        else:
+            return []
+
+    @receiver(post_save, sender=User)
+    def createGameInstance(sender, instance, created, **kwargs):
+        if created:
+            ZoloVideos.objects.create(user=instance)
+
+
+class Videos(models.Model):
+    country = models.CharField(max_length=150)
+    videos = models.TextField()
+
+    def __str__(self):
+        return self.country
