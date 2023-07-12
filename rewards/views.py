@@ -13,7 +13,7 @@ from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos
 from django.utils import timezone as django_timezone
 from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
 from .models import Subject, Quiz, Questions
-import yt_dlp as youtube_dl
+
 
 User = get_user_model()
 
@@ -435,27 +435,22 @@ class GetZoloVideos(APIView):
 
         # Get the unwatched video URLs based on the user's country
         unwatched_urls = zolo_videos.get_videos_by_country()
-
-        # Get the streaming URL for each video URL
-        stream_urls = [get_stream_url(url) for url in unwatched_urls]
-
-        # Return your response or render the template with the stream URLs
-        return Response({"urls": stream_urls}, status=status.HTTP_200_OK)
+        return Response({"urls": unwatched_urls}, status=status.HTTP_200_OK)
 
 
-def get_stream_url(video_url):
-    # Create youtube_dl options dictionary
-    ydl_opts = {
-        'format': 'best',
-        'quiet': True
-    }
-
-    # Create youtube_dl extractor
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(video_url, download=False)
-        stream_url = info_dict['url']
-
-    return stream_url
+# def get_stream_url(video_url):
+#     # Create youtube_dl options dictionary
+#     ydl_opts = {
+#         'format': 'best',
+#         'quiet': True
+#     }
+#
+#     # Create youtube_dl extractor
+#     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+#         info_dict = ydl.extract_info(video_url, download=False)
+#         stream_url = info_dict['url']
+#
+#     return stream_url
 
 
 class ZoloVideoApi(APIView):
