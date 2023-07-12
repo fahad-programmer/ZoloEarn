@@ -13,6 +13,7 @@ from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos
 from django.utils import timezone as django_timezone
 from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
 from .models import Subject, Quiz, Questions
+
 User = get_user_model()
 
 
@@ -431,17 +432,9 @@ class GetZoloVideos(APIView):
         # Retrieve ZoloVideos instance for the current user
         zolo_videos = ZoloVideos.objects.get(user=request.user)
 
-
         # Get the unwatched video URLs based on the user's country
         unwatched_urls = zolo_videos.get_videos_by_country()
         return Response({"urls": unwatched_urls}, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
 
 
 class ZoloVideoApi(APIView):
