@@ -13,7 +13,7 @@ from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos
 from django.utils import timezone as django_timezone
 from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
 from .models import Subject, Quiz, Questions
-import yt_dlp as youtube_dl
+# import yt_dlp as youtube_dl
 
 User = get_user_model()
 
@@ -426,36 +426,36 @@ def load_questions_from_json_view(request):
     return HttpResponse("All Questions Added")
 
 
-class GetZoloVideos(APIView):
-    authentication_classes = [TokenAuthentication]
+# class GetZoloVideos(APIView):
+#     authentication_classes = [TokenAuthentication]
 
-    def get(self, request):
-        # Retrieve ZoloVideos instance for the current user
-        zolo_videos = ZoloVideos.objects.get(user=request.user)
+#     def get(self, request):
+#         # Retrieve ZoloVideos instance for the current user
+#         zolo_videos = ZoloVideos.objects.get(user=request.user)
 
-        # Get the unwatched video URLs based on the user's country
-        unwatched_urls = zolo_videos.get_videos_by_country()
+#         # Get the unwatched video URLs based on the user's country
+#         unwatched_urls = zolo_videos.get_videos_by_country()
 
-        # Get the streaming URL for each video URL
-        stream_urls = [get_stream_url(url) for url in unwatched_urls]
+#         # Get the streaming URL for each video URL
+#         stream_urls = [get_stream_url(url) for url in unwatched_urls]
 
-        # Return your response or render the template with the stream URLs
-        return Response({"urls": stream_urls}, status=status.HTTP_200_OK)
+#         # Return your response or render the template with the stream URLs
+#         return Response({"urls": stream_urls}, status=status.HTTP_200_OK)
 
 
-def get_stream_url(video_url):
-    # Create youtube_dl options dictionary
-    ydl_opts = {
-        'format': 'best',
-        'quiet': True
-    }
+# def get_stream_url(video_url):
+#     # Create youtube_dl options dictionary
+#     ydl_opts = {
+#         'format': 'best',
+#         'quiet': True
+#     }
 
-    # Create youtube_dl extractor
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(video_url, download=False)
-        stream_url = info_dict['url']
+#     # Create youtube_dl extractor
+#     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+#         info_dict = ydl.extract_info(video_url, download=False)
+#         stream_url = info_dict['url']
 
-    return stream_url
+#     return stream_url
 
 
 class ZoloVideoApi(APIView):
