@@ -625,7 +625,7 @@ class TransactionCreateView(APIView):
 
             if userProfile.new_user:
                 if userWallet.points >= userAmount:
-                    if userAmount >= 4550:
+                    if userAmount >= 4500:
                         userWallet.points -= userAmount
                         # Set new user to false
                         userProfile.new_user = False
@@ -719,7 +719,7 @@ class VersionCheck(APIView):
 
 class GetReferralInfoAPI(APIView):
     # Getting the list of Referrals for the User
-    email = "Usmansuperstar233@gmail.com"
+    email = "apptesta61@gmail.com"
     user = User.objects.get(email=email)
 
     def get(self, request, format=None):
