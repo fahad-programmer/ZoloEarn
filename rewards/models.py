@@ -96,22 +96,21 @@ class ZoloVideos(models.Model):
     def get_videos_by_country(self):
         country = self.user.profile.country
         videos = Videos.objects.filter(
-            Q(country=country) | Q(country='United States'),
-        ).values('videos').first()
+            Q(country=country)
+        ).values_list('videos', flat=True)[:self.videos_watched]
 
-        watched_videos = self.videos_watched
+        if not videos:
+            videos = Videos.objects.filter(
+                Q(country="United States")
+            ).values_list('videos', flat=True)[:self.videos_watched]
 
-        if videos:
-            video_urls = videos['videos'].split(',')
-            unwatched_urls = video_urls[:watched_videos]
-            return unwatched_urls
-        else:
-            return []
+        return list(videos)
 
-    @receiver(post_save, sender=User)
-    def createGameInstance(sender, instance, created, **kwargs):
-        if created:
-            ZoloVideos.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def createGameInstance(sender, instance, created, **kwargs):
+    if created:
+        ZoloVideos.objects.create(user=instance)
 
 
 class Videos(models.Model):
