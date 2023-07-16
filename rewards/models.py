@@ -4,6 +4,7 @@ from django.db.models import CharField, Q
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils import timezone
 
 
 # Create your models here.
@@ -87,13 +88,36 @@ class Questions(models.Model):
 
 class ZoloVideos(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    videos_watched = models.PositiveIntegerField(default=20, validators=[MinValueValidator(0), MaxValueValidator(20)])
+    videos_watched = models.PositiveIntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(50)])
     last_watched = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.user.username
 
+    def get_remaining_reset_time(self):
+        if self.videos_watched == 0 and self.last_watched <= timezone.now() - timezone.timedelta(hours=24):
+            # Videos have been reset, so no time remaining until the next reset
+            return timezone.timedelta()
+
+        # Calculate the time remaining until the next reset
+        reset_time = self.last_watched + timezone.timedelta(hours=24)
+        remaining_time = reset_time - timezone.now()
+        return remaining_time
+
     def get_videos_by_country(self):
+        remaining_reset_time = self.get_remaining_reset_time()
+
+        if self.videos_watched == 0 and remaining_reset_time > timezone.timedelta():
+            # If the user has 0 watched videos but there is remaining time until the next reset,
+            # return an empty list of videos to indicate that the user needs to wait for the reset.
+            return []
+        else:
+            # Reset the videos_watched count to the default value (20)
+            self.videos_watched = 20
+            # Set the last_watched time to the current time since the videos have been reset
+            self.last_watched = timezone.now()
+            self.save()
+
         country = self.user.profile.country
         videos = Videos.objects.filter(
             Q(country=country)

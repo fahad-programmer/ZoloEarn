@@ -432,8 +432,18 @@ class GetZoloVideos(APIView):
         # Retrieve ZoloVideos instance for the current user
         zolo_videos = ZoloVideos.objects.get(user=request.user)
 
+        # Check if the user has 0 watched videos and return the message with remaining time
+        if zolo_videos.videos_watched == 0 and zolo_videos.get_remaining_reset_time() > timezone.timedelta():
+            remaining_reset_time = zolo_videos.get_remaining_reset_time()
+            remaining_time_hours = remaining_reset_time.total_seconds() // 3600
+            remaining_time_minutes = (remaining_reset_time.total_seconds() % 3600) // 60
+
+            message = f"Please wait for {int(remaining_time_hours)} hours and {int(remaining_time_minutes)} minutes To Watch Again"
+            return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
+
         # Get the unwatched video URLs based on the user's country
         unwatched_urls = zolo_videos.get_videos_by_country()
+
         return Response({"urls": unwatched_urls}, status=status.HTTP_200_OK)
 
 
