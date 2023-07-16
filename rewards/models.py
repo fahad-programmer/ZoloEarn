@@ -111,12 +111,14 @@ class ZoloVideos(models.Model):
             # If the user has 0 watched videos but there is remaining time until the next reset,
             # return an empty list of videos to indicate that the user needs to wait for the reset.
             return []
-        else:
+        elif self.videos_watched == 0 and remaining_reset_time < timezone.timedelta():
             # Reset the videos_watched count to the default value (20)
             self.videos_watched = 20
             # Set the last_watched time to the current time since the videos have been reset
             self.last_watched = timezone.now()
             self.save()
+        else:
+            pass
 
         country = self.user.profile.country
         videos = Videos.objects.filter(
