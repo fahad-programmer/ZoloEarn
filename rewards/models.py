@@ -121,14 +121,21 @@ class ZoloVideos(models.Model):
         country = self.user.profile.country
         videos = Videos.objects.filter(
             Q(country=country)
-        ).values_list('videos', flat=True)[:self.videos_watched]
+        )
 
         if not videos:
             videos = Videos.objects.filter(
                 Q(country="United States")
-            ).values_list('videos', flat=True)[:self.videos_watched]
+            )
 
-        return list(videos)
+        if videos:
+            video_urls = videos['videos'].split(',')
+            unwatched_urls = video_urls[:self.videos_watched]
+            return unwatched_urls
+        else:
+            return []
+
+        return videos
 
 
 @receiver(post_save, sender=User)
