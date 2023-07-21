@@ -20,7 +20,9 @@ urlpatterns = [
     path('quizTurns', views.QuizInTurns.as_view()),
     path("automatequiz", views.load_questions_from_json_view, name="nothing"),
     path("getZoloVideos", views.GetZoloVideos.as_view()),
-    path("ZoloVideoApi", views.ZoloVideoApi.as_view())
+    path("ZoloVideoApi", views.ZoloVideoApi.as_view()),
+    path("getZoloArticles", views.getZoloArticles.as_view()),
+    path("ZoloArticleApi", views.ZoloArticlesApi.as_view())
 ]
 
 

@@ -9,7 +9,7 @@ from datetime import timedelta, timezone
 from datetime import timedelta
 from rest_framework import viewsets
 from django.utils import timezone
-from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos
+from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos, ZoloArticles
 from django.utils import timezone as django_timezone
 from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
 from .models import Subject, Quiz, Questions
@@ -464,6 +464,51 @@ class ZoloVideoApi(APIView):
 
         # Adding entry to recent earnings
         user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Zolo Videos",
+                                                            point_earned=2)
+        user_recent_earning.save()
+
+        return Response({"message": "Completed the api transaction"})
+
+
+class getZoloArticles(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request):
+        # Retrieve ZoloVideos instance for the current user
+        zolo_articles = ZoloArticles.objects.get(user=request.user)
+
+        # Check if the user has 0 watched videos and return the message with remaining time
+        if zolo_articles.articles_read == 0 and zolo_articles.get_remaining_reset_time() > timezone.timedelta():
+            remaining_reset_time = zolo_articles.get_remaining_reset_time()
+            remaining_time_hours = remaining_reset_time.total_seconds() // 3600
+            remaining_time_minutes = (remaining_reset_time.total_seconds() % 3600) // 60
+
+            message = f"Please wait for {int(remaining_time_hours)} hours and {int(remaining_time_minutes)} minutes To Read Again"
+            return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the unwatched articles URLs based on the user's country
+        unread_articles = zolo_articles.get_user_articles()
+
+        return Response({"urls": unread_articles}, status=status.HTTP_200_OK)
+
+
+class ZoloArticlesApi(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        userZoloArticlesObj = ZoloArticles.objects.get(user=request.user)
+
+        userZoloArticlesObj.articles_read -= 1
+        userZoloArticlesObj.save()
+
+        # Adding points to wallet
+        userWallet = Wallet.objects.get(user=request.user)
+
+        userWallet.points += 2
+        userWallet.save()
+
+        # Adding entry to recent earnings
+        user_recent_earning = RecentEarnings.objects.create(user=request.user, way_to_earn="Zolo Articles",
                                                             point_earned=2)
         user_recent_earning.save()
 
