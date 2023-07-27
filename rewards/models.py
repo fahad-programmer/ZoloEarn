@@ -122,18 +122,25 @@ class ZoloVideos(models.Model):
         else:
             pass
 
+        available_videos = 50 - self.videos_watched
+
+        # Handling the edge case that it is never zero
+
+        if available_videos < 0:
+            available_videos = 0
+
         country = self.user.profile.country
         videos = Videos.objects.filter(
             Q(country=country)
-        ).values_list('videos', flat=True)[:self.videos_watched]
+        ).values_list('videos', flat=True)[available_videos:]
 
         if not videos:
             videos = Videos.objects.filter(
                 Q(country="United States")
-            ).values_list('videos', flat=True)[:self.videos_watched]
+            ).values_list('videos', flat=True)[available_videos:]
 
         if videos:
-            videos = [url for video in videos for url in video.split(',')][:self.videos_watched]
+            videos = [url for video in videos for url in video.split(',')][available_videos:]
         else:
             videos = []
 
@@ -150,11 +157,15 @@ class Videos(models.Model):
 
 class Articles(models.Model):
     """The Main Model That Will Consists OF The Article"""
-
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=500, default="None")
     country = models.CharField(max_length=150)
     banner_image_url = models.CharField(max_length=1000)
     meta_description = models.CharField(max_length=700)
     article_body = models.TextField()
+
+    def __str__(self):
+        return self.title
 
 
 class ZoloArticles(models.Model):
@@ -179,22 +190,19 @@ class ZoloArticles(models.Model):
         remaining_reset_time = self.get_remaining_reset_time()
 
         if self.articles_read == 0 and remaining_reset_time == timezone.timedelta():
-            # Reset the videos_watched count to the default value (20)
+            # Reset the articles_read count to the default value (20)
             self.articles_read = 50
-            # Set the last_watched time to the current time since the videos have been reset
+            # Set the last_read time to the current time since the articles have been reset
             self.last_read = timezone.now()
             self.save()
         else:
             pass
 
-        country = self.user.profile.country
-        articles = Articles.objects.filter(
-            Q(country=country)
-        )[:self.articles_read]
+        available_articles = 2 - self.articles_read
 
-        if not articles:
-            articles = Articles.objects.filter(
-                Q(country="United States")
-            )[:self.articles_read]
+        if available_articles < 0:
+            available_articles = 0
+
+        articles = Articles.objects.all().values('id', 'banner_image_url', 'meta_description')[available_articles:]
 
         return articles

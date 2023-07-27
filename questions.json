@@ -1,62 +1,92 @@
 [
-  {
-    "subject": "Biology",
-    "question": "Which enzyme converts glucose to glycogen?",
-    "choices": ["Amylase", "Lipase", "Glycogenase", "Glucokinase"],
-    "correct_answer": "Glucokinase"
-  },
-  {
-    "subject": "Biology",
-    "question": "Which hormone regulates blood calcium levels?",
-    "choices": ["Insulin", "Cortisol", "Calcitonin", "Progesterone"],
-    "correct_answer": "Calcitonin"
-  },
-  {
-    "subject": "Biology",
-    "question": "What is the role of the Golgi apparatus in a cell?",
-    "choices": ["Protein synthesis", "Energy production", "Cell division", "Packaging and modifying proteins"],
-    "correct_answer": "Packaging and modifying proteins"
-  },
-  {
-    "subject": "Biology",
-    "question": "What is the function of the semicircular canals in the human ear?",
-    "choices": ["Sense temperature", "Maintain balance", "Detect light intensity", "Produce sound waves"],
-    "correct_answer": "Maintain balance"
-  },
-  {
-    "subject": "Biology",
-    "question": "Which part of the brain is responsible for regulating body temperature?",
-    "choices": ["Cerebrum", "Cerebellum", "Hypothalamus", "Medulla oblongata"],
-    "correct_answer": "Hypothalamus"
-  },
-  {
-    "subject": "Biology",
-    "question": "Which process involves the exchange of gases between the alveoli and the blood?",
-    "choices": ["Osmosis", "Filtration", "Diffusion", "Active transport"],
-    "correct_answer": "Diffusion"
-  },
-  {
-    "subject": "Biology",
-    "question": "What is the largest known species of shark?",
-    "choices": ["Great white shark", "Whale shark", "Tiger shark", "Hammerhead shark"],
-    "correct_answer": "Whale shark"
-  },
-  {
-    "subject": "Biology",
-    "question": "Which part of a plant is responsible for water absorption?",
-    "choices": ["Roots", "Stems", "Leaves", "Flowers"],
-    "correct_answer": "Roots"
-  },
-  {
-    "subject": "Biology",
-    "question": "Which process involves the production of gametes?",
-    "choices": ["Fertilization", "Mitosis", "Meiosis", "Budding"],
-    "correct_answer": "Meiosis"
-  },
-  {
-    "subject": "Biology",
-    "question": "Which blood vessel carries oxygenated blood back to the heart from the lungs?",
-    "choices": ["Aorta", "Pulmonary artery", "Pulmonary vein", "Vena cava"],
-    "correct_answer": "Pulmonary vein"
-  }
+{
+"subject": "History",
+"question": "Who was the first President of the United States?",
+"choices": ["Thomas Jefferson", "George Washington", "John Adams", "James Madison"],
+"correct_answer": "George Washington"
+},
+{
+"subject": "History",
+"question": "In which year did Christopher Columbus first reach the Americas?",
+"choices": ["1492", "1501", "1510", "1520"],
+"correct_answer": "1492"
+},
+{
+"subject": "History",
+"question": "Which ancient civilization built the Machu Picchu citadel in the 15th century?",
+"choices": ["Inca", "Maya", "Aztec", "Egyptian"],
+"correct_answer": "Inca"
+},
+{
+"subject": "History",
+"question": "Who wrote the famous historical work 'The Histories'?",
+"choices": ["Plato", "Herodotus", "Aristotle", "Thucydides"],
+"correct_answer": "Herodotus"
+},
+{
+"subject": "History",
+"question": "The Magna Carta, signed in 1215, was a significant historical document that influenced the development of which concept?",
+"choices": ["Democracy", "Communism", "Human rights", "Capitalism"],
+"correct_answer": "Democracy"
+},
+{
+"subject": "History",
+"question": "Who was the leader of the Soviet Union during World War II?",
+"choices": ["Joseph Stalin", "Vladimir Lenin", "Nikita Khrushchev", "Mikhail Gorbachev"],
+"correct_answer": "Joseph Stalin"
+},
+{
+"subject": "History",
+"question": "Which ancient civilization built the Great Pyramid of Giza?",
+"choices": ["Roman", "Greek", "Mesopotamian", "Egyptian"],
+"correct_answer": "Egyptian"
+},
+{
+"subject": "History",
+"question": "In which year did the United States declare its independence from Great Britain?",
+"choices": ["1776", "1783", "1790", "1801"],
+"correct_answer": "1776"
+},
+{
+"subject": "History",
+"question": "Who was the first woman to fly solo across the Atlantic Ocean?",
+"choices": ["Bessie Coleman", "Amelia Earhart", "Valentina Tereshkova", "Sally Ride"],
+"correct_answer": "Amelia Earhart"
+},
+{
+"subject": "History",
+"question": "During which war was the Battle of Gettysburg fought?",
+"choices": ["American Revolutionary War", "War of 1812", "American Civil War", "World War I"],
+"correct_answer": "American Civil War"
+},
+{
+"subject": "History",
+"question": "Who was the leader of the Nazi Party during World War II?",
+"choices": ["Benito Mussolini", "Hirohito", "Joseph Stalin", "Adolf Hitler"],
+"correct_answer": "Adolf Hitler"
+},
+{
+"subject": "History",
+"question": "In which year did the Berlin Wall fall, leading to the reunification of Germany?",
+"choices": ["1987", "1989", "1991", "1993"],
+"correct_answer": "1989"
+},
+{
+"subject": "History",
+"question": "Which Egyptian pharaoh is known for his tomb filled with treasures, discovered by Howard Carter in 1922?",
+"choices": ["Ramses II", "Tutankhamun", "Hatshepsut", "Thutmose III"],
+"correct_answer": "Tutankhamun"
+},
+{
+"subject": "History",
+"question": "Who was the first female Prime Minister of India?",
+"choices": ["Indira Gandhi", "Golda Meir", "Margaret Thatcher", "Benazir Bhutto"],
+"correct_answer": "Indira Gandhi"
+},
+{
+"subject": "History",
+"question": "Which European explorer led the first expedition to circumnavigate the globe?",
+"choices": ["Christopher Columbus", "Ferdinand Magellan", "Vasco da Gama", "James Cook"],
+"correct_answer": "Ferdinand Magellan"
+}
 ]

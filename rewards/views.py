@@ -489,7 +489,7 @@ class getZoloArticles(APIView):
         # Get the unwatched articles URLs based on the user's country
         unread_articles = zolo_articles.get_user_articles()
 
-        return Response({"urls": unread_articles}, status=status.HTTP_200_OK)
+        return Response({"articles": unread_articles}, status=status.HTTP_200_OK)
 
 
 class ZoloArticlesApi(APIView):
