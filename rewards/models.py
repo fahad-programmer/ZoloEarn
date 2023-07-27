@@ -203,6 +203,6 @@ class ZoloArticles(models.Model):
         if available_articles < 0:
             available_articles = 0
 
-        articles = Articles.objects.all().values('id', 'banner_image_url', 'meta_description')[available_articles:]
+        articles = Articles.objects.all().values('id', 'title', 'banner_image_url', 'meta_description')[available_articles:]
 
         return articles
