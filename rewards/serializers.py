@@ -1,6 +1,8 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import MonsterHunter, Questions
+from rest_framework import serializers
+from .models import Articles
+
+from .models import Questions
 
 User = get_user_model()
 
@@ -29,3 +31,9 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class QuizApiSerializer(serializers.Serializer):
     points = serializers.CharField(max_length=5)
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Articles
+        exclude = ('meta_description', 'country', 'id')

@@ -9,9 +9,10 @@ from datetime import timedelta, timezone
 from datetime import timedelta
 from rest_framework import viewsets
 from django.utils import timezone
-from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos, ZoloArticles
+from .models import SpinWheel, MonsterHunter, TickTacToe, ZoloVideos, ZoloArticles, Articles
 from django.utils import timezone as django_timezone
-from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer
+from .serializers import QuestionSerializer, QuizApiSerializer, QuizSerializer, MonsterHunterSerializer, \
+    ArticleSerializer
 from .models import Subject, Quiz, Questions
 
 User = get_user_model()
@@ -513,3 +514,13 @@ class ZoloArticlesApi(APIView):
         user_recent_earning.save()
 
         return Response({"message": "Completed the api transaction"})
+
+
+class ArticleDetailView(APIView):
+    def get(self, request, article_id):
+        try:
+            article = Articles.objects.get(id=article_id)
+            serializer = ArticleSerializer(article)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Articles.DoesNotExist:
+            return Response({'message': 'Article not found'}, status=status.HTTP_404_NOT_FOUND)

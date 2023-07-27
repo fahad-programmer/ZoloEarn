@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import ArticleDetailView
 
 urlpatterns = [
     path("spin-wheel", views.SpinWheelView.as_view()),
@@ -22,7 +23,8 @@ urlpatterns = [
     path("getZoloVideos", views.GetZoloVideos.as_view()),
     path("ZoloVideoApi", views.ZoloVideoApi.as_view()),
     path("getZoloArticles", views.getZoloArticles.as_view()),
-    path("ZoloArticleApi", views.ZoloArticlesApi.as_view())
+    path("ZoloArticleApi", views.ZoloArticlesApi.as_view()),
+    path('articles/<int:article_id>/', ArticleDetailView.as_view(), name='article-detail')
 ]
 
 
