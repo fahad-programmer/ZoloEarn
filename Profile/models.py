@@ -61,7 +61,7 @@ class Wallet(models.Model):
             Wallet.objects.create(user=instance)
 
     def __str__(self) -> str:
-        return self.user.username
+        return  self.user.username
 
 
 class Transaction(models.Model):
