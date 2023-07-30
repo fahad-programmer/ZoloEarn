@@ -85,13 +85,6 @@ class RecentEarnings(models.Model):
     def __str__(self) -> str:
         return f"{self.user.first_name} earned {self.point_earned} through {self.way_to_earn}"
 
-    def save(self, *args, **kwargs):
-        # Call the original save method to create the new entry
-        super(RecentEarnings, self).save(*args, **kwargs)
-
-        # Get the number of records exceeding 10 and delete them
-        excess_records = RecentEarnings.objects.filter(user=self.user).order_by('-created_at')[10:]
-        excess_records.delete()
 
 class Referral(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
