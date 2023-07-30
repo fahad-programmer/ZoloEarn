@@ -172,7 +172,17 @@ class CheckVerificationPin(APIView):
                         minutes=5):
                     user.is_active = True
                     user.save()
+
+                    # Giving the user bonus points
+                    user_recent_objects = RecentEarnings.objects.create(user, "Signup Bonus", 50)
+                    user_recent_objects.save()
+
+                    # Adding points in the wallet
+                    user_wallet = Wallet.objects.get(user=user)
+                    user_wallet.points += 50
+                    user_wallet.save()
                     return Response({'message': 'Pin verified successfully'}, status=status.HTTP_200_OK)
+
                 elif timezone.now() > verify_pin_obj.created_at + timezone.timedelta(minutes=5):
                     user.delete()
                     return Response({"message": "The Pin Is Expired Please Signup Again"})
@@ -252,22 +262,22 @@ class ReferralView(APIView):
             # Add points to the referrer's wallet and create a new referral
             referrer_wallet = Wallet.objects.get(user=current_user)
             Referral.objects.create(user=Profile.objects.get(user=current_user), code=code)
-            referrer_wallet.points += 50
+            referrer_wallet.points += 150
             referrer_wallet.save()
 
             # Writing the earning history from database
             referrer_earning = RecentEarnings.objects.create(user=current_user, way_to_earn="Referral Points",
-                                                             point_earned=50)
+                                                             point_earned=150)
             referrer_earning.save()
 
             # Add points to the referred user's wallet
             referred_user_wallet = Wallet.objects.get(user=referred_user)
-            referred_user_wallet.points += 25
+            referred_user_wallet.points += 75
             referred_user_wallet.save()
 
             # Writing the earning history from database
             referrerd_earning = RecentEarnings.objects.create(user=referred_user, way_to_earn="Referral Points",
-                                                              point_earned=25)
+                                                              point_earned=75)
             referrerd_earning.save()
 
             return Response({"message": "Referral successful"}, status=status.HTTP_200_OK)
@@ -452,6 +462,15 @@ class SocialAccountApi(viewsets.ModelViewSet):
             userObject = User.objects.create(
                 email=email, first_name=first_name, username=userObjectUsername)
             userObject.save()
+
+            # Giving the user bonus points
+            user_recent_objects = RecentEarnings.objects.create(userObject, "Signup Bonus", 50)
+            user_recent_objects.save()
+
+            # Adding points in the wallet
+            user_wallet = Wallet.objects.get(user=userObject)
+            user_wallet.points += 50
+            user_wallet.save()
 
             # Save device_id in Profile model
             profile = Profile.objects.get(user=userObject)

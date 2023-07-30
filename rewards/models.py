@@ -176,6 +176,11 @@ class ZoloArticles(models.Model):
     def __str__(self):
         return self.user.username
 
+    @receiver(post_save, sender=User)
+    def createGameInstance(sender, instance, created, **kwargs):
+        if created:
+            ZoloArticles.objects.create(user=instance)
+
     def get_remaining_reset_time(self):
         if self.articles_read == 0 and self.last_read <= timezone.now() - timezone.timedelta(hours=24):
             # Videos have been reset, so no time remaining until the next reset
