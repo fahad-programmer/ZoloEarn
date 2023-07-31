@@ -203,29 +203,6 @@ class TransactionListView(generics.ListAPIView):
         return Transaction.objects.filter(user=user)
 
 
-class AppRating(APIView):
-    authentication_classes = [TokenAuthentication]
-
-    def post(self, request, *args):
-        # Check if the user already has an object for App rating
-        user = request.user
-        existing_rating = RecentEarnings.objects.filter(user=user, way_to_earn='App Rating').exists()
-
-        if existing_rating:
-            return Response({'message': 'You have already received points for App rating.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        user_wallet = Wallet.objects.get(user=user)
-        user_wallet.points += 30
-        user_wallet.save()
-
-        # Adding entry to recent earnings
-        user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="App Rating", point_earned=30)
-        user_recent_earning.save()
-
-        return Response({"message": "Points added for App rating."}, status=status.HTTP_200_OK)
-
-
 class ReferralView(APIView):
     authentication_classes = [TokenAuthentication]
     queryset = Referral.objects.all()
@@ -328,7 +305,7 @@ class ReferralList(APIView):
 class ForgotPasswordView(APIView):
     def post(self, request, format=None):
 
-        # Deleting all the objects that are elder than 15 mains
+        # Deleting all the objects that are older than 15 mains
         ResetPassword.objects.filter(
             created_at__lte=timezone.now() - timezone.timedelta(minutes=15)).delete()
 
@@ -681,7 +658,7 @@ class RecentEarningsView(APIView):
     def get(self, request):
         user = request.user
         recent_earnings = RecentEarnings.objects.filter(
-            user=user).order_by('-created_at')[:10][::-1]
+            user=user).order_by('-created_at')[:10]
         serializer = RecentEarningsSerializer(recent_earnings, many=True)
         return Response(serializer.data)
 

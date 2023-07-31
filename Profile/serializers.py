@@ -5,6 +5,7 @@ from .models import generate_username, Profile
 
 User = get_user_model()
 
+
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
 
@@ -19,17 +20,19 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data['username'] = username
         user = User.objects.create_user(**validated_data)
         return user
-    
+
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('points', 'payment_method', 'created_at', 'completed')
 
+
 class CreateTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('address', 'points', 'payment_method')
+
 
 class ReferralSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,7 +48,6 @@ class GetReferralSerializer(serializers.ModelSerializer):
         model = Referral
         fields = ['referred_user', 'signed_up_at']
         read_only_fields = ['referred_user', 'signed_up_at']
-
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
@@ -68,11 +70,11 @@ class UserResetPassword(serializers.Serializer):
 
 
 class SocialAccountSerializer(serializers.Serializer):
-    email =  serializers.EmailField()
+    email = serializers.EmailField()
     first_name = serializers.CharField(max_length=50)
     device_id = serializers.CharField(max_length=500)
     country = serializers.CharField(max_length=200)
-    
+
 
 class UserStatsSerializer(serializers.ModelSerializer):
     wallet_points = serializers.IntegerField(source='wallet.points')
@@ -97,10 +99,12 @@ class ProfileImageSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ["profile_pic_name"]
 
+
 class PaymentInfoSerializer(serializers.Serializer):
     currencyInfo = serializers.CharField(max_length=100)
     currencyRate = serializers.IntegerField()
-    
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
     username = serializers.CharField(source='user.username', required=False)
@@ -108,7 +112,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["email",'number', 'first_name', 'dob', 'country', 'username', 'profile_pic_path']
+        fields = ["email", 'number', 'first_name', 'dob', 'country', 'username', 'profile_pic_path']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -129,4 +133,3 @@ class HelpCenterSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpCenter
         fields = ('subject', 'message')
-

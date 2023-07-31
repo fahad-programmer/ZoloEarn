@@ -82,8 +82,4 @@ urlpatterns = [
 
     # Verify pin
     path('verify-user-pin', views.CheckVerificationPin.as_view(), name="verifyPin"),
-
-    # app reward
-    path('app-rate', views.AppRating.as_view(), name="apprate")
-
 ]
