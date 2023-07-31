@@ -203,7 +203,7 @@ class ZoloArticles(models.Model):
         else:
             pass
 
-        available_articles = 2 - self.articles_read
+        available_articles = 50 - self.articles_read
 
         if available_articles < 0:
             available_articles = 0
