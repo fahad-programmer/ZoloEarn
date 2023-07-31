@@ -132,12 +132,12 @@ class ZoloVideos(models.Model):
         country = self.user.profile.country
         videos = Videos.objects.filter(
             Q(country=country)
-        ).values_list('videos', flat=True)[available_videos:]
+        ).values_list('videos', flat=True)
 
         if not videos:
             videos = Videos.objects.filter(
                 Q(country="United States")
-            ).values_list('videos', flat=True)[available_videos:]
+            ).values_list('videos', flat=True)
 
         if videos:
             videos = [url for video in videos for url in video.split(',')][available_videos:]
