@@ -1,4 +1,7 @@
 import json
+import random
+
+import requests
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
@@ -25,6 +28,11 @@ class SpinWheelView(APIView):
 
         # Getting the spinwheel object
         user_spin_object = SpinWheel.objects.get(user=request.user)
+
+        if user_spin_object.spin_available == 0:
+            return Response({'message': f'{0} points added to your account.'}, status=status.HTTP_200_OK)
+        else:
+            pass
 
         # Continue with the normal flow if the user has spins available or has not played in the last 24 hours
         # Get the number of points earned from the spin wheel from the POST request data
@@ -210,8 +218,20 @@ class TTCApiView(APIView):
 
         # TTC Object
         userTTCObject = TickTacToe.objects.get(user=user)
-        userTTCObject.turn_available -= 1
-        userTTCObject.save()
+
+        if userTTCObject.turn_available > 0:
+            userTTCObject.turn_available -= 1
+            userTTCObject.save()
+        else:
+            userTTCObject.turn_available = 0
+            userTTCObject.save()
+
+            # Now adding points to the user wallet ()
+            userWallet = Wallet.objects.get(user=user)
+            userWallet.points += 0
+            userWallet.save()
+
+            return Response({"message": "Points Added To The Wallet"}, status=status.HTTP_200_OK)
 
         # Adding entry to recent earnings
         user_recent_earning = RecentEarnings.objects.create(user=user, way_to_earn="Tic Tac Toe", point_earned=5)
@@ -340,7 +360,7 @@ class QuizApi(viewsets.ModelViewSet):
         if serializer.is_valid():
             points = serializer.validated_data['points']
 
-            # Add those points to the wallet and deduct a turn
+            # Add those points to the wallet
             userWallet = Wallet.objects.get(user=request.user)
             userWallet.points += int(points)
             userWallet.save()
@@ -401,29 +421,69 @@ class QuizInTurns(APIView):
             return Response({"message": "Some Error Occurred"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Function related to automating the quiz section
-def load_questions_from_json_view(request):
-    json_file = 'questions.json'  # Specify the path to your JSON file
+def fetch_quiz_questions(subject):
+    category = 0
+    if subject == "History":
+        category = 23
+    elif subject == "Maths":
+        category = 19
+    elif subject == "Sports":
+        category = 21
+    elif subject == "Geography":
+        category = 22
+    elif subject == "Biology" or subject == "Chemistry":
+        category = 17
 
-    with open(json_file, 'r') as file:
-        data = json.load(file)
+    url = f"https://opentdb.com/api.php?amount=50&category={category}"  # You can change the amount of questions as per your requirement
+    response = requests.get(url)
+    if response.status_code == 200:
+        print(response.json()["results"])
+        return response.json()["results"]
+    else:
+        return None
 
-    for item in data:
-        subject_name = item['subject']
-        subject, _ = Subject.objects.get_or_create(subject=subject_name)
+
+def process_questions(api_questions, subject):
+    for api_question in api_questions:
+        subject_name = f"{subject}"  # Set the subject based on the category from the API or use a mapping for subjects
+        question_text = api_question["question"]
+        correct_answer = api_question["correct_answer"]
+        incorrect_answers = api_question["incorrect_answers"]
+
+        # Skip the question if it doesn't have at least three incorrect answers
+        if len(incorrect_answers) < 3:
+            continue
+
+        # Shuffle the choices randomly
+        random.shuffle(incorrect_answers)
+        choices = incorrect_answers[:3]
+        choices.append(correct_answer)
+
+        # Get or create the Subject instance
+        subject_obj, _ = Subject.objects.get_or_create(subject=subject_name)
 
         question = Questions.objects.create(
-            subject=subject,
-            question=item['question'],
-            choice1=item['choices'][0],
-            choice2=item['choices'][1],
-            choice3=item['choices'][2],
-            choice4=item['choices'][3],
-            answer=item['correct_answer']
+            subject=subject_obj,
+            question=question_text,
+            choice1=choices[0],
+            choice2=choices[1],
+            choice3=choices[2],
+            choice4=choices[3],
+            answer=correct_answer
         )
-        print("Done")
 
-    return HttpResponse("All Questions Added")
+        print("done")
+
+
+def import_quiz_questions(request):
+    api_questions = fetch_quiz_questions("Sports")
+    if api_questions:
+        process_questions(api_questions, "Sports")
+        print("Quiz questions imported successfully!")
+    else:
+        print("Failed to fetch quiz questions from the API.")
+
+    return HttpResponse("Done")
 
 
 class GetZoloVideos(APIView):
@@ -453,6 +513,11 @@ class ZoloVideoApi(APIView):
 
     def post(self, request):
         userZoloVideoObj = ZoloVideos.objects.get(user=request.user)
+
+        if userZoloVideoObj.videos_watched > 0:
+            pass
+        else:
+            return Response({"message": "Completed the api transaction"})
 
         userZoloVideoObj.videos_watched -= 1
         userZoloVideoObj.save()

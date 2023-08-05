@@ -86,6 +86,8 @@ class Questions(models.Model):
         return self.question
 
 
+
+
 class ZoloVideos(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     videos_watched = models.PositiveIntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(50)])

@@ -19,12 +19,12 @@ urlpatterns = [
     path('quizApi', views.QuizApi.as_view({'post': 'post'})),
     path('addQuizApi', views.AddQuizInApi.as_view()),
     path('quizTurns', views.QuizInTurns.as_view()),
-    path("automatequiz", views.load_questions_from_json_view, name="nothing"),
     path("getZoloVideos", views.GetZoloVideos.as_view()),
     path("ZoloVideoApi", views.ZoloVideoApi.as_view()),
     path("getZoloArticles", views.getZoloArticles.as_view()),
     path("ZoloArticleApi", views.ZoloArticlesApi.as_view()),
-    path('articles/<int:article_id>/', ArticleDetailView.as_view(), name='article-detail')
+    path('articles/<int:article_id>/', ArticleDetailView.as_view(), name='article-detail'),
+    path("quizAutomate", views.import_quiz_questions)
 ]
 
 

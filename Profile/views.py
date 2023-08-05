@@ -173,10 +173,6 @@ class CheckVerificationPin(APIView):
                     user.is_active = True
                     user.save()
 
-                    # Giving the user bonus points
-                    user_recent_objects = RecentEarnings.objects.create(user, "Signup Bonus", 50)
-                    user_recent_objects.save()
-
                     # Adding points in the wallet
                     user_wallet = Wallet.objects.get(user=user)
                     user_wallet.points += 50
@@ -439,10 +435,6 @@ class SocialAccountApi(viewsets.ModelViewSet):
             userObject = User.objects.create(
                 email=email, first_name=first_name, username=userObjectUsername)
             userObject.save()
-
-            # Giving the user bonus points
-            user_recent_objects = RecentEarnings.objects.create(userObject, "Signup Bonus", 50)
-            user_recent_objects.save()
 
             # Adding points in the wallet
             user_wallet = Wallet.objects.get(user=userObject)
